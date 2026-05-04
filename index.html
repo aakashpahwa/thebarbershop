@@ -1172,6 +1172,7 @@ function loadPlaylist(pl) {
     },
     events: {
       onReady: function(event) {
+        event.target.mute();
         event.target.setVolume(30);
         event.target.playVideo();
       },
@@ -1189,13 +1190,22 @@ function loadPlaylist(pl) {
         }
       },
       onError: function(event) {
-        // Error 150/101 = embed restricted, skip to next
-        if (event.data === 150 || event.data === 101 || event.data === 153) {
-          setTimeout(() => { event.target.nextVideo(); }, 500);
-        }
+        // Any error = skip to next video in playlist
+        try { event.target.nextVideo(); } catch(e) {}
       }
     }
   });
+
+  // Fallback: if player doesn't start within 4s, try forcing play
+  setTimeout(() => {
+    if (ytPlayer && typeof ytPlayer.getPlayerState === 'function') {
+      const state = ytPlayer.getPlayerState();
+      if (state !== YT.PlayerState.PLAYING && state !== YT.PlayerState.BUFFERING) {
+        ytPlayer.mute();
+        ytPlayer.playVideo();
+      }
+    }
+  }, 4000);
 }
 
 // ===== PLAY PLAYLIST =====
@@ -1243,13 +1253,15 @@ window.addEventListener('load', () => {
 });
 
 // Unmute on first user interaction (browser autoplay policy requires muted start)
-document.addEventListener('click', function unmuteOnce() {
+function unmutePlayer() {
   if (ytPlayer && typeof ytPlayer.unMute === 'function') {
     ytPlayer.unMute();
     ytPlayer.setVolume(30);
   }
-  document.removeEventListener('click', unmuteOnce);
-}, { once: true });
+}
+document.addEventListener('click', unmutePlayer, { once: true });
+document.addEventListener('keydown', unmutePlayer, { once: true });
+document.addEventListener('touchstart', unmutePlayer, { once: true });
 
 // ===== RADIO MODE BUTTONS =====
 function setMode(btn, mode) {
