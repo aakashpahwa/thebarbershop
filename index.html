@@ -813,6 +813,15 @@
     border: none;
   }
 
+  .yt-bar-thumb {
+    width: 56px;
+    height: 56px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid rgba(200,133,42,0.3);
+    flex-shrink: 0;
+  }
+
   .yt-info {
     flex: 1;
   }
@@ -1126,6 +1135,7 @@
   <div class="yt-iframe-wrap">
     <div id="ytPlayerDiv"></div>
   </div>
+  <img class="yt-bar-thumb" id="ytBarThumb" src="" alt="">
   <div class="yt-info">
     <div class="yt-playing-label">♪ Now Playing</div>
     <div class="yt-song-title" id="ytSongTitle">—</div>
@@ -1301,6 +1311,7 @@ function playPlaylist(pl, card) {
   card.classList.add('active');
 
   document.getElementById('ytSongTitle').textContent = pl.name;
+  document.getElementById('ytBarThumb').src = pl.thumb;
   document.getElementById('marqueeText').textContent =
     `♪ ${pl.songs}   ✦   ${pl.name} — ${pl.era}   ✦   ♪ ${pl.songs}   ✦   ${pl.name} — ${pl.era}`;
 
