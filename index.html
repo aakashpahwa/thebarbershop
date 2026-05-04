@@ -1229,6 +1229,7 @@ ytPlaylists.forEach((pl, idx) => {
 let ytPlayer = null;
 let ytReady = false;
 let pendingPlaylist = null;
+let userUnmuted = false;
 
 function onYouTubeIframeAPIReady() {
   ytReady = true;
@@ -1255,7 +1256,7 @@ function loadPlaylist(pl) {
       listType: 'playlist',
       list: pl.listId,
       autoplay: 1,
-      mute: 1,
+      mute: userUnmuted ? 0 : 1,
       rel: 0,
       loop: 1,
       origin: window.location.origin
@@ -1263,9 +1264,14 @@ function loadPlaylist(pl) {
     events: {
       onReady: function(event) {
         event.target.setVolume(30);
+        if (userUnmuted) {
+          event.target.unMute();
+        }
         event.target.playVideo();
-        // Always show unmute button since we start muted
-        document.getElementById('ytUnmuteBtn').style.display = 'inline-block';
+        // Show unmute button only if user hasn't already unmuted
+        if (!userUnmuted) {
+          document.getElementById('ytUnmuteBtn').style.display = 'inline-block';
+        }
       },
       onStateChange: function(event) {
         if (event.data === YT.PlayerState.PLAYING) {
@@ -1325,6 +1331,7 @@ function closePlayer() {
 }
 
 function unmuteAndPlay() {
+  userUnmuted = true;
   if (ytPlayer) {
     try {
       ytPlayer.unMute();
