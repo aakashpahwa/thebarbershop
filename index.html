@@ -1438,6 +1438,12 @@ function setMode(btn, mode) {
     if(['AM','FM','SW'].includes(b.textContent.trim())) b.classList.remove('active');
   });
   btn.classList.add('active');
+  // Switch to a random playlist (different from current)
+  const currentIdx = ytPlaylists.findIndex(pl => pl._card && pl._card.classList.contains('active'));
+  let idx;
+  do { idx = Math.floor(Math.random() * ytPlaylists.length); } while (idx === currentIdx && ytPlaylists.length > 1);
+  const pl = ytPlaylists[idx];
+  if (pl && pl._card) playPlaylist(pl, pl._card);
 }
 
 let muted = false;
