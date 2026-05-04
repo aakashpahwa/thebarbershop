@@ -781,11 +781,11 @@
     right: 0;
     background: rgba(26,14,5,0.97);
     border-top: 2px solid var(--amber);
-    padding: 16px 24px;
+    padding: 14px 20px;
     z-index: 50;
     display: none;
     align-items: center;
-    gap: 20px;
+    gap: 12px;
     box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
     transform: translateY(100%);
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -798,18 +798,18 @@
   }
 
   .yt-iframe-wrap {
-    width: 240px;
-    height: 135px;
-    flex-shrink: 0;
-    border-radius: 6px;
+    width: 1px;
+    height: 1px;
     overflow: hidden;
-    border: 1px solid rgba(200,133,42,0.3);
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
   }
 
   .yt-iframe-wrap iframe,
   .yt-iframe-wrap div {
-    width: 100%;
-    height: 100%;
+    width: 1px;
+    height: 1px;
     border: none;
   }
 
@@ -855,13 +855,13 @@
     background: var(--amber);
     color: #1a1a1a;
     border: none;
-    padding: 6px 14px;
+    padding: 10px 20px;
     border-radius: 20px;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: bold;
     cursor: pointer;
     animation: pulse-unmute 1.5s ease-in-out infinite;
-    flex-shrink: 0;
+    white-space: nowrap;
   }
   @keyframes pulse-unmute {
     0%, 100% { transform: scale(1); }
@@ -901,17 +901,16 @@
 
   /* RESPONSIVE */
   @media (max-width: 768px) {
-    .scene { padding: 20px 12px 100px; }
+    .scene { padding: 20px 12px 90px; }
     .radio-body { width: 90vw; padding: 16px 18px 20px; }
     .logo-container { width: 150px; height: 120px; }
     .playlist-section { margin-top: 30px; }
     .playlist-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-    .yt-player { flex-wrap: wrap; padding: 12px 14px; gap: 10px; }
-    .yt-iframe-wrap { width: 120px; height: 68px; }
+    .yt-player { padding: 12px 14px; gap: 10px; }
     .yt-info { min-width: 0; flex: 1; }
     .yt-song-title { font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .yt-unmute-btn { padding: 8px 12px; font-size: 0.7rem; order: 10; flex-basis: 100%; text-align: center; }
-    .yt-close { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; font-size: 0.85rem; }
+    .yt-unmute-btn { padding: 8px 14px; font-size: 0.75rem; }
+    .yt-close { width: 28px; height: 28px; font-size: 0.85rem; }
     .controls-row { gap: 8px; }
     .dial { width: 40px; height: 40px; }
     .antenna { height: 50px; top: -50px; right: 25px; }
@@ -919,17 +918,16 @@
   }
 
   @media (max-width: 480px) {
-    .scene { padding: 14px 8px 100px; }
+    .scene { padding: 14px 8px 80px; }
     .radio-body { width: 96vw; padding: 12px 12px 16px; }
     .logo-container { width: 120px; height: 100px; margin-bottom: 12px; }
     .site-title { letter-spacing: 0.1em; }
     .playlist-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
     .card-name { font-size: 0.72rem; }
     .card-info { padding: 8px 10px; }
-    .yt-player { flex-wrap: wrap; padding: 10px 12px; gap: 8px; }
-    .yt-iframe-wrap { width: 100px; height: 56px; }
+    .yt-player { padding: 10px 12px; gap: 8px; }
     .yt-song-title { font-size: 0.75rem; }
-    .yt-unmute-btn { padding: 10px 16px; font-size: 0.75rem; order: 10; flex-basis: 100%; }
+    .yt-unmute-btn { padding: 8px 12px; font-size: 0.7rem; }
     .r-btn { padding: 6px 10px; font-size: 0.55rem; }
     .radio-buttons { gap: 6px; flex-wrap: wrap; justify-content: center; }
     .freq-num { font-size: 0.4rem; }
@@ -941,7 +939,6 @@
 
   @media (max-width: 360px) {
     .playlist-grid { grid-template-columns: 1fr; }
-    .yt-iframe-wrap { width: 80px; height: 45px; }
   }
 </style>
 </head>
@@ -1252,12 +1249,13 @@ function loadPlaylist(pl) {
   }
 
   ytPlayer = new YT.Player('ytPlayerDiv', {
-    height: '135',
-    width: '240',
+    height: '1',
+    width: '1',
     playerVars: {
       listType: 'playlist',
       list: pl.listId,
       autoplay: 1,
+      mute: 1,
       rel: 0,
       loop: 1,
       origin: window.location.origin
@@ -1265,8 +1263,9 @@ function loadPlaylist(pl) {
     events: {
       onReady: function(event) {
         event.target.setVolume(30);
-        event.target.unMute();
         event.target.playVideo();
+        // Always show unmute button since we start muted
+        document.getElementById('ytUnmuteBtn').style.display = 'inline-block';
       },
       onStateChange: function(event) {
         if (event.data === YT.PlayerState.PLAYING) {
@@ -1287,23 +1286,6 @@ function loadPlaylist(pl) {
       }
     }
   });
-
-  // Fallback: if unmuted autoplay was blocked, retry muted then show unmute button
-  setTimeout(() => {
-    if (ytPlayer && typeof ytPlayer.getPlayerState === 'function') {
-      const state = ytPlayer.getPlayerState();
-      const isMuted = ytPlayer.isMuted && ytPlayer.isMuted();
-      // Show unmute button if player is muted OR not playing at all
-      if (state !== YT.PlayerState.PLAYING && state !== YT.PlayerState.BUFFERING) {
-        ytPlayer.mute();
-        ytPlayer.playVideo();
-        document.getElementById('ytUnmuteBtn').style.display = 'inline-block';
-      } else if (isMuted) {
-        // Playing but muted (browser blocked unmuted autoplay)
-        document.getElementById('ytUnmuteBtn').style.display = 'inline-block';
-      }
-    }
-  }, 5000);
 }
 
 // ===== PLAY PLAYLIST =====
@@ -1343,9 +1325,12 @@ function closePlayer() {
 }
 
 function unmuteAndPlay() {
-  if (ytPlayer && typeof ytPlayer.unMute === 'function') {
-    ytPlayer.unMute();
-    ytPlayer.setVolume(30);
+  if (ytPlayer) {
+    try {
+      ytPlayer.unMute();
+      ytPlayer.setVolume(30);
+      ytPlayer.playVideo();
+    } catch(e) {}
   }
   document.getElementById('ytUnmuteBtn').style.display = 'none';
 }
