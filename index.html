@@ -1197,6 +1197,9 @@ function loadPlaylist(pl) {
       onStateChange: function(event) {
         if (event.data === YT.PlayerState.PLAYING) {
           window.__ytPlaying = true;
+          // Hide unmute button if it was shown
+          const btn = document.getElementById('ytUnmuteBtn');
+          if (btn) btn.style.display = 'none';
           try {
             const videoData = event.target.getVideoData();
             if (videoData && videoData.title) {
@@ -1218,13 +1221,14 @@ function loadPlaylist(pl) {
   setTimeout(() => {
     if (!window.__ytPlaying && ytPlayer && typeof ytPlayer.getPlayerState === 'function') {
       const state = ytPlayer.getPlayerState();
+      // Only mute+retry if player truly isn't playing/buffering
       if (state !== YT.PlayerState.PLAYING && state !== YT.PlayerState.BUFFERING) {
         ytPlayer.mute();
         ytPlayer.playVideo();
         document.getElementById('ytUnmuteBtn').style.display = 'inline-block';
       }
     }
-  }, 3000);
+  }, 5000);
 }
 
 // ===== PLAY PLAYLIST =====
