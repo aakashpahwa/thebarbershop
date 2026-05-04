@@ -822,6 +822,10 @@
     flex-shrink: 0;
   }
 
+  .yt-bar-thumb[src=""] {
+    display: none;
+  }
+
   .yt-info {
     flex: 1;
   }
@@ -860,7 +864,6 @@
   .yt-close:hover { background: rgba(200,133,42,0.1); border-color: var(--amber); }
 
   .yt-unmute-btn {
-    display: none;
     background: var(--amber);
     color: #1a1a1a;
     border: none;
@@ -869,8 +872,15 @@
     font-size: 0.85rem;
     font-weight: bold;
     cursor: pointer;
-    animation: pulse-unmute 1.5s ease-in-out infinite;
     white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .yt-unmute-btn:hover {
+    transform: scale(1.05);
+  }
+  .yt-unmute-btn.muted {
+    animation: pulse-unmute 1.5s ease-in-out infinite;
   }
   @keyframes pulse-unmute {
     0%, 100% { transform: scale(1); }
@@ -1140,7 +1150,7 @@
     <div class="yt-playing-label">♪ Now Playing</div>
     <div class="yt-song-title" id="ytSongTitle">—</div>
   </div>
-  <button class="yt-unmute-btn" id="ytUnmuteBtn" onclick="unmuteAndPlay()">🔊 Click for Sound</button>
+  <button class="yt-unmute-btn muted" id="ytUnmuteBtn" onclick="toggleSound()">🔇 Tap for Sound</button>
   <button class="yt-close" onclick="closePlayer()">✕</button>
 </div>
 
@@ -1276,12 +1286,11 @@ function loadPlaylist(pl) {
         event.target.setVolume(30);
         if (userUnmuted) {
           event.target.unMute();
+          updateMuteButton(false);
+        } else {
+          updateMuteButton(true);
         }
         event.target.playVideo();
-        // Show unmute button only if user hasn't already unmuted
-        if (!userUnmuted) {
-          document.getElementById('ytUnmuteBtn').style.display = 'inline-block';
-        }
       },
       onStateChange: function(event) {
         if (event.data === YT.PlayerState.PLAYING) {
@@ -1341,16 +1350,40 @@ function closePlayer() {
   }, 400);
 }
 
-function unmuteAndPlay() {
-  userUnmuted = true;
-  if (ytPlayer) {
-    try {
-      ytPlayer.unMute();
-      ytPlayer.setVolume(30);
-      ytPlayer.playVideo();
-    } catch(e) {}
+function toggleSound() {
+  const btn = document.getElementById('ytUnmuteBtn');
+  if (!userUnmuted) {
+    // Currently muted -> unmute
+    userUnmuted = true;
+    if (ytPlayer) {
+      try {
+        ytPlayer.unMute();
+        ytPlayer.setVolume(30);
+        ytPlayer.playVideo();
+      } catch(e) {}
+    }
+    updateMuteButton(false);
+  } else {
+    // Currently unmuted -> mute
+    userUnmuted = false;
+    if (ytPlayer) {
+      try {
+        ytPlayer.mute();
+      } catch(e) {}
+    }
+    updateMuteButton(true);
   }
-  document.getElementById('ytUnmuteBtn').style.display = 'none';
+}
+
+function updateMuteButton(isMuted) {
+  const btn = document.getElementById('ytUnmuteBtn');
+  if (isMuted) {
+    btn.textContent = '🔇 Tap for Sound';
+    btn.classList.add('muted');
+  } else {
+    btn.textContent = '🔊 Sound On';
+    btn.classList.remove('muted');
+  }
 }
 
 // ===== AUTO-PLAY DEFAULT SOFT PLAYLIST =====
