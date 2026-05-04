@@ -1165,20 +1165,19 @@ function loadPlaylist(pl) {
       listType: 'playlist',
       list: pl.listId,
       autoplay: 1,
-      mute: 1,
       rel: 0,
       loop: 1,
       origin: window.location.origin
     },
     events: {
       onReady: function(event) {
-        event.target.mute();
         event.target.setVolume(30);
+        event.target.unMute();
         event.target.playVideo();
       },
       onStateChange: function(event) {
-        // Update marquee with current video title if available
         if (event.data === YT.PlayerState.PLAYING) {
+          window.__ytPlaying = true;
           try {
             const videoData = event.target.getVideoData();
             if (videoData && videoData.title) {
@@ -1196,16 +1195,24 @@ function loadPlaylist(pl) {
     }
   });
 
-  // Fallback: if player doesn't start within 4s, try forcing play
+  // Fallback: if unmuted autoplay was blocked, retry muted then unmute on click
   setTimeout(() => {
-    if (ytPlayer && typeof ytPlayer.getPlayerState === 'function') {
+    if (!window.__ytPlaying && ytPlayer && typeof ytPlayer.getPlayerState === 'function') {
       const state = ytPlayer.getPlayerState();
       if (state !== YT.PlayerState.PLAYING && state !== YT.PlayerState.BUFFERING) {
         ytPlayer.mute();
         ytPlayer.playVideo();
+        // Show a subtle prompt and unmute on interaction
+        document.addEventListener('click', function unmute() {
+          if (ytPlayer && typeof ytPlayer.unMute === 'function') {
+            ytPlayer.unMute();
+            ytPlayer.setVolume(30);
+          }
+          document.removeEventListener('click', unmute);
+        }, { once: true });
       }
     }
-  }, 4000);
+  }, 3000);
 }
 
 // ===== PLAY PLAYLIST =====
@@ -1252,16 +1259,7 @@ window.addEventListener('load', () => {
   }
 });
 
-// Unmute on first user interaction (browser autoplay policy requires muted start)
-function unmutePlayer() {
-  if (ytPlayer && typeof ytPlayer.unMute === 'function') {
-    ytPlayer.unMute();
-    ytPlayer.setVolume(30);
-  }
-}
-document.addEventListener('click', unmutePlayer, { once: true });
-document.addEventListener('keydown', unmutePlayer, { once: true });
-document.addEventListener('touchstart', unmutePlayer, { once: true });
+
 
 // ===== RADIO MODE BUTTONS =====
 function setMode(btn, mode) {
