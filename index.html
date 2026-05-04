@@ -3,7 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Barber Shop</title>
+<title>The Barber Shop — Old Hindi Songs Radio | Nostalgic Ambience</title>
+<meta name="description" content="Step into a vintage Indian barber shop and listen to timeless old Hindi songs from the golden era. Curated playlists of Kishore Kumar, Lata Mangeshkar, Mohammed Rafi, and more playing on an animated retro radio.">
+<meta name="keywords" content="old Hindi songs, vintage radio, barber shop ambience, retro Bollywood music, golden era Hindi music, Kishore Kumar, Lata Mangeshkar, Mohammed Rafi, Mukesh, nostalgic Indian music">
+<meta name="author" content="Aakash Pahwa">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://aakashpahwa.github.io/thebarbershop/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="The Barber Shop — Old Hindi Songs Radio">
+<meta property="og:description" content="A nostalgic ambient experience with curated old Hindi film songs playing on an animated vintage radio. Step back to the golden era.">
+<meta property="og:url" content="https://aakashpahwa.github.io/thebarbershop/">
+<meta property="og:image" content="https://i.ytimg.com/vi/KqpIIaCJggY/hqdefault.jpg">
+<meta property="og:site_name" content="The Barber Shop">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Barber Shop — Old Hindi Songs Radio">
+<meta name="twitter:description" content="A nostalgic ambient experience with curated old Hindi film songs on a vintage radio.">
+<meta name="twitter:image" content="https://i.ytimg.com/vi/KqpIIaCJggY/hqdefault.jpg">
+
+<meta name="theme-color" content="#1a0e05">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "The Barber Shop",
+  "description": "A nostalgic ambient web experience featuring curated old Hindi film songs from the golden era, playing on an animated vintage radio.",
+  "url": "https://aakashpahwa.github.io/thebarbershop/",
+  "applicationCategory": "EntertainmentApplication",
+  "operatingSystem": "Any",
+  "author": { "@type": "Person", "name": "Aakash Pahwa" },
+  "genre": ["Hindi Film Music", "Golden Era Bollywood", "Ambient"],
+  "keywords": "old Hindi songs, vintage radio, barber shop ambience, retro Bollywood"
+}
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Special+Elite&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -758,6 +793,7 @@
 
   .yt-player.open {
     display: flex;
+    flex-wrap: wrap;
     transform: translateY(0);
   }
 
@@ -864,10 +900,48 @@
   }
 
   /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .scene { padding: 20px 12px 100px; }
+    .radio-body { width: 90vw; padding: 16px 18px 20px; }
+    .logo-container { width: 150px; height: 120px; }
+    .playlist-section { margin-top: 30px; }
+    .playlist-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+    .yt-player { flex-wrap: wrap; padding: 12px 14px; gap: 10px; }
+    .yt-iframe-wrap { width: 120px; height: 68px; }
+    .yt-info { min-width: 0; flex: 1; }
+    .yt-song-title { font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .yt-unmute-btn { padding: 8px 12px; font-size: 0.7rem; order: 10; flex-basis: 100%; text-align: center; }
+    .yt-close { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; font-size: 0.85rem; }
+    .controls-row { gap: 8px; }
+    .dial { width: 40px; height: 40px; }
+    .antenna { height: 50px; top: -50px; right: 25px; }
+    .tagline { font-size: 0.75rem; margin-top: 24px; }
+  }
+
   @media (max-width: 480px) {
-    .radio-body { width: 94vw; padding: 16px 18px 20px; }
-    .playlist-grid { grid-template-columns: 1fr 1fr; }
-    .yt-iframe-wrap { width: 160px; height: 90px; }
+    .scene { padding: 14px 8px 100px; }
+    .radio-body { width: 96vw; padding: 12px 12px 16px; }
+    .logo-container { width: 120px; height: 100px; margin-bottom: 12px; }
+    .site-title { letter-spacing: 0.1em; }
+    .playlist-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .card-name { font-size: 0.72rem; }
+    .card-info { padding: 8px 10px; }
+    .yt-player { flex-wrap: wrap; padding: 10px 12px; gap: 8px; }
+    .yt-iframe-wrap { width: 100px; height: 56px; }
+    .yt-song-title { font-size: 0.75rem; }
+    .yt-unmute-btn { padding: 10px 16px; font-size: 0.75rem; order: 10; flex-basis: 100%; }
+    .r-btn { padding: 6px 10px; font-size: 0.55rem; }
+    .radio-buttons { gap: 6px; flex-wrap: wrap; justify-content: center; }
+    .freq-num { font-size: 0.4rem; }
+    .speaker-grille { height: 60px; padding: 6px; }
+    .display-panel { padding: 6px 8px; }
+    .marquee-text { font-size: 0.7rem; }
+    .waveform { height: 18px; }
+  }
+
+  @media (max-width: 360px) {
+    .playlist-grid { grid-template-columns: 1fr; }
+    .yt-iframe-wrap { width: 80px; height: 45px; }
   }
 </style>
 </head>
@@ -1197,9 +1271,6 @@ function loadPlaylist(pl) {
       onStateChange: function(event) {
         if (event.data === YT.PlayerState.PLAYING) {
           window.__ytPlaying = true;
-          // Hide unmute button if it was shown
-          const btn = document.getElementById('ytUnmuteBtn');
-          if (btn) btn.style.display = 'none';
           try {
             const videoData = event.target.getVideoData();
             if (videoData && videoData.title) {
@@ -1219,12 +1290,16 @@ function loadPlaylist(pl) {
 
   // Fallback: if unmuted autoplay was blocked, retry muted then show unmute button
   setTimeout(() => {
-    if (!window.__ytPlaying && ytPlayer && typeof ytPlayer.getPlayerState === 'function') {
+    if (ytPlayer && typeof ytPlayer.getPlayerState === 'function') {
       const state = ytPlayer.getPlayerState();
-      // Only mute+retry if player truly isn't playing/buffering
+      const isMuted = ytPlayer.isMuted && ytPlayer.isMuted();
+      // Show unmute button if player is muted OR not playing at all
       if (state !== YT.PlayerState.PLAYING && state !== YT.PlayerState.BUFFERING) {
         ytPlayer.mute();
         ytPlayer.playVideo();
+        document.getElementById('ytUnmuteBtn').style.display = 'inline-block';
+      } else if (isMuted) {
+        // Playing but muted (browser blocked unmuted autoplay)
         document.getElementById('ytUnmuteBtn').style.display = 'inline-block';
       }
     }
