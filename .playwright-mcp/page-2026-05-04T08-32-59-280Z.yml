@@ -1,0 +1,93 @@
+- generic [active] [ref=e1]:
+  - generic: ✂
+  - generic: ✂
+  - generic: ✂
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - heading "The Barber Shop" [level=1] [ref=e7]
+      - paragraph [ref=e9]: Est. Since the Days of Old Hindi Radio
+    - img [ref=e16]
+    - generic [ref=e41]:
+      - generic [ref=e43]: ✦ Vividh Bharati ✦
+      - generic [ref=e129]:
+        - generic [ref=e130]: ◉ On Air
+        - generic [ref=e132]: ♪ Lag Ja Gale, Tujhe Dekha Toh, Tere Bina Zindagi Se — instrumental versions ✦ Instrumental Hindi — Soft & Relaxing — 1950s–80s ✦ ♪ Lag Ja Gale, Tujhe Dekha Toh, Tere Bina Zindagi Se — instrumental versions ✦ Instrumental Hindi — Soft & Relaxing — 1950s–80s
+      - generic [ref=e135]:
+        - generic [ref=e138]: Tuner
+        - generic [ref=e141]:
+          - generic [ref=e143]: "550"
+          - generic [ref=e146]: "700"
+          - generic [ref=e149]: "900"
+          - generic [ref=e152]: "1100"
+          - generic [ref=e155]: "1400"
+        - generic [ref=e160]: Volume
+      - generic [ref=e161]:
+        - button "AM" [ref=e162] [cursor=pointer]
+        - button "FM" [ref=e163] [cursor=pointer]
+        - button "SW" [ref=e164] [cursor=pointer]
+        - button "◉ Mute" [ref=e165] [cursor=pointer]
+    - generic [ref=e169]:
+      - generic [ref=e170]:
+        - generic [ref=e172]: Choose Your Era
+        - generic [ref=e174]: Old Hindi Cinema Playlists — Play on the Barber Shop Radio
+      - generic [ref=e175]:
+        - generic [ref=e176] [cursor=pointer]:
+          - text: ♪ NOW PLAYING
+          - generic [ref=e177]:
+            - img "Instrumental Hindi — Soft & Relaxing" [ref=e178]
+            - generic [ref=e179]: ▶
+          - generic [ref=e180]:
+            - generic [ref=e181]: Instrumental Hindi — Soft & Relaxing
+            - generic [ref=e182]: 1950s–80s · Click to tune in
+        - generic [ref=e183] [cursor=pointer]:
+          - generic [ref=e184]:
+            - img "Kishore Kumar — Hit Songs" [ref=e185]
+            - generic [ref=e186]: ▶
+          - generic [ref=e187]:
+            - generic [ref=e188]: Kishore Kumar — Hit Songs
+            - generic [ref=e189]: 1960s–80s · Click to tune in
+        - generic [ref=e190] [cursor=pointer]:
+          - generic [ref=e191]:
+            - img "Lata Mangeshkar — Timeless Hits" [ref=e192]
+            - generic [ref=e193]: ▶
+          - generic [ref=e194]:
+            - generic [ref=e195]: Lata Mangeshkar — Timeless Hits
+            - generic [ref=e196]: 1950s–70s · Click to tune in
+        - generic [ref=e197] [cursor=pointer]:
+          - generic [ref=e198]:
+            - img "Mohammed Rafi — Golden Collection" [ref=e199]
+            - generic [ref=e200]: ▶
+          - generic [ref=e201]:
+            - generic [ref=e202]: Mohammed Rafi — Golden Collection
+            - generic [ref=e203]: 1950s–70s · Click to tune in
+        - generic [ref=e204] [cursor=pointer]:
+          - generic [ref=e205]:
+            - img "Mukesh — Soulful Melodies" [ref=e206]
+            - generic [ref=e207]: ▶
+          - generic [ref=e208]:
+            - generic [ref=e209]: Mukesh — Soulful Melodies
+            - generic [ref=e210]: 1950s–70s · Click to tune in
+        - generic [ref=e211] [cursor=pointer]:
+          - generic [ref=e212]:
+            - img "Asha Bhosle — Superhit Songs" [ref=e213]
+            - generic [ref=e214]: ▶
+          - generic [ref=e215]:
+            - generic [ref=e216]: Asha Bhosle — Superhit Songs
+            - generic [ref=e217]: 1960s–80s · Click to tune in
+        - generic [ref=e218] [cursor=pointer]:
+          - generic [ref=e219]:
+            - img "Old is Gold — 60s 70s 80s Mix" [ref=e220]
+            - generic [ref=e221]: ▶
+          - generic [ref=e222]:
+            - generic [ref=e223]: Old is Gold — 60s 70s 80s Mix
+            - generic [ref=e224]: 1960s–80s · Click to tune in
+    - paragraph [ref=e225]:
+      - text: "\"Woh lamhe, woh baatein, woh purani yaadein...\""
+      - text: Those moments, those conversations, those old memories...
+  - generic [ref=e226]:
+    - iframe [ref=e228]:
+      
+    - generic [ref=e229]:
+      - generic [ref=e230]: ♪ Now Playing
+      - generic [ref=e231]: Instrumental Hindi — Soft & Relaxing
+    - button "✕" [ref=e232] [cursor=pointer]

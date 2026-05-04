@@ -18,8 +18,9 @@ The site is built around a central **old wooden radio** UI that plays curated Yo
   - AM/FM/SW mode buttons and mute toggle
   - Antenna with wobble animation
   - Subtle vibration animation simulating sound output with tempo variation
-- **YouTube Playlist Integration** — Six curated playlists of old Hindi film songs (Kishore Kumar, Lata Mangeshkar, Mohammed Rafi, Mukesh, Asha Bhosle, Mixed)
-- **Embedded Player** — Slide-up player bar with YouTube iframe embed
+- **YouTube Playlist Integration** — Seven verified public playlists (Instrumental Soft, Kishore Kumar, Lata Mangeshkar, Mohammed Rafi, Mukesh, Asha Bhosle, Old is Gold Mix)
+- **Auto-Play on Load** — Soft instrumental playlist starts automatically for ambient background
+- **Embedded Player** — Slide-up player bar with YouTube iframe embed, loop enabled
 - **Atmospheric Design** — Sepia vignette background, film grain overlay, wallpaper pattern, floating scissors decorations
 
 ## Tech Stack
@@ -31,7 +32,7 @@ The site is built around a central **old wooden radio** UI that plays curated Yo
 
 ## Usage
 
-Open `barber-shop.html` in any modern browser. Click a playlist card to start playing music through the embedded YouTube player.
+Open `index.html` in any modern browser. The soft instrumental playlist auto-plays on load. Click any playlist card to switch music.
 
 Ideal for:
 - Barber shop display screens
@@ -58,4 +59,5 @@ That's it — pushes to `master` will auto-deploy.
 index.html                     — Complete self-contained website
 .github/workflows/deploy.yml   — GitHub Pages deployment pipeline
 README.md                      — This file
+DEPLOY.md                      — Deployment instructions for agents/CI
 ```

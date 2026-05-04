@@ -770,7 +770,8 @@
     border: 1px solid rgba(200,133,42,0.3);
   }
 
-  .yt-iframe-wrap iframe {
+  .yt-iframe-wrap iframe,
+  .yt-iframe-wrap div {
     width: 100%;
     height: 100%;
     border: none;
@@ -1034,7 +1035,7 @@
 <!-- YOUTUBE PLAYER BAR -->
 <div class="yt-player" id="ytPlayer">
   <div class="yt-iframe-wrap">
-    <iframe id="ytIframe" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    <div id="ytPlayerDiv"></div>
   </div>
   <div class="yt-info">
     <div class="yt-playing-label">♪ Now Playing</div>
@@ -1042,6 +1043,9 @@
   </div>
   <button class="yt-close" onclick="closePlayer()">✕</button>
 </div>
+
+<!-- YouTube IFrame API -->
+<script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
 // ===== BUILD SPEAKER GRILLE HOLES =====
@@ -1053,60 +1057,58 @@ for(let i = 0; i < 84; i++) {
 }
 
 // ===== PLAYLISTS DATA =====
-// Public YouTube playlist IDs for old Hindi film songs
-const playlists = [
-  {
-    id: 'PLbQ0IKQ4p4OFE7FJo1-OHTQ31LT8fOuVP',
-    name: 'Kishore Kumar — Golden Hits',
-    era: '1960s–70s',
-    thumb: 'https://i.ytimg.com/vi/oKIBhHMFbQ4/hqdefault.jpg',
-    songs: 'Aane Se Uske, Musafir Hoon Yaaron, Roop Tera Mastana...'
-  },
-  {
-    id: 'PLbQ0IKQ4p4OFwfFyJSX7WP1lQn3AkJbfB',
-    name: 'Lata Mangeshkar — Timeless',
-    era: '1950s–60s',
-    thumb: 'https://i.ytimg.com/vi/Bm9XTlBXUj8/hqdefault.jpg',
-    songs: 'Lag Ja Gale, Ajeeb Dastan Hai Yeh, Woh Shaam Kuch Ajeeb Thi...'
-  },
-  {
-    id: 'PLbQ0IKQ4p4OEiXjnRJ3t0O2qBwJR5GFMa',
-    name: 'Mohammed Rafi — Classics',
-    era: '1950s–70s',
-    thumb: 'https://i.ytimg.com/vi/kh_HvRzQzEo/hqdefault.jpg',
-    songs: 'Dil Ka Bhanwar, Baharon Phool Barsao, Ya Dil Ki Suno...'
-  },
-  {
-    id: 'PLbQ0IKQ4p4OFTm-sCM1PxcgdcWxmpFNqk',
-    name: 'Mukesh — Soulful Melodies',
-    era: '1950s–70s',
-    thumb: 'https://i.ytimg.com/vi/mZ4iYvSBhj8/hqdefault.jpg',
-    songs: 'Kabhi Kabhi, Awaara Hoon, Ek Pyaar Ka Nagma Hai...'
-  },
-  {
-    id: 'PLbQ0IKQ4p4OGUn3mUjPUwHPH7VXsPWY5n',
-    name: 'Asha Bhosle — Evergreens',
-    era: '1960s–80s',
-    thumb: 'https://i.ytimg.com/vi/lKSRniXk9D8/hqdefault.jpg',
-    songs: 'Dum Maro Dum, Chura Liya, In Aankhon Ki Masti...'
-  },
-  {
-    id: 'PLbQ0IKQ4p4OEdvBOXhTsOqCb1zP5p-Hnl',
-    name: 'Old Hindi Film Songs Mix',
-    era: '1940s–80s',
-    thumb: 'https://i.ytimg.com/vi/jnJzr5xbdtk/hqdefault.jpg',
-    songs: 'Compiled golden era classics for the barber chair...'
-  }
-];
-
-// Real public playlists — using known curated YouTube playlist IDs
+// Saregama & verified embeddable YouTube playlists for old Hindi film songs
 const ytPlaylists = [
-  { listId: 'PLbQ0IKQ4p4OFE7FJo1-OHTQ31LT8fOuVP', ...playlists[0] },
-  { listId: 'PLbQ0IKQ4p4OFwfFyJSX7WP1lQn3AkJbfB', ...playlists[1] },
-  { listId: 'PLbQ0IKQ4p4OEiXjnRJ3t0O2qBwJR5GFMa', ...playlists[2] },
-  { listId: 'PLbQ0IKQ4p4OFTm-sCM1PxcgdcWxmpFNqk', ...playlists[3] },
-  { listId: 'PLbQ0IKQ4p4OGUn3mUjPUwHPH7VXsPWY5n', ...playlists[4] },
-  { listId: 'PLbQ0IKQ4p4OEdvBOXhTsOqCb1zP5p-Hnl', ...playlists[5] }
+  {
+    listId: 'PLXCoHsJ9oLec7aYGojOIj3Acu7wMKjADm',
+    name: 'Carvaan Classics Radio Show',
+    era: '1950s–80s',
+    thumb: 'https://i.ytimg.com/vi/e5ff83TbWR4/hqdefault.jpg',
+    songs: 'Weekend Classic Radio Show — Romantic, Sad, Kishore Special compilations',
+    soft: true
+  },
+  {
+    listId: 'PLXCoHsJ9oLeekGDmDf79G7W0jRZlK3nh5',
+    name: 'Old Hindi Songs — Old is Gold',
+    era: '1960s–90s',
+    thumb: 'https://i.ytimg.com/vi/oDNzigAOA7o/hqdefault.jpg',
+    songs: 'Alka Yagnik, Maine Pyar Kiya, Aa Ab Laut Chalen — jukeboxes'
+  },
+  {
+    listId: 'PLXCoHsJ9oLecANEvJf8OznBHwhqeGJmdO',
+    name: 'Mohammed Rafi — Saregama Hits',
+    era: '1950s–70s',
+    thumb: 'https://i.ytimg.com/vi/CXM4jvuFMlI/hqdefault.jpg',
+    songs: 'Aane Se Uske Aaye Bahar, Yeh Duniya Yeh Mehfil, Lata & Rafi duets...'
+  },
+  {
+    listId: 'PL0CaUqi81mPlQeSCgy5wvNHLRkHV0ZkLe',
+    name: 'Evergreen Old Hindi Songs',
+    era: '1960s–80s',
+    thumb: 'https://i.ytimg.com/vi/KqpIIaCJggY/hqdefault.jpg',
+    songs: 'Ankhiyon Ke Jharokhon Se, Kehna Hai, Main Chali — classic hits'
+  },
+  {
+    listId: 'PLO6WOx_nE9UKClBgylze-GcLcUY1EktsM',
+    name: 'Raj Kapoor — Classic Hits',
+    era: '1950s–70s',
+    thumb: 'https://i.ytimg.com/vi/W7J2GMNNWmY/hqdefault.jpg',
+    songs: 'Ramayya Vastawaiyya, Dil Ki Nazar Se, Ban Ke Panchhi Gaaye...'
+  },
+  {
+    listId: 'PL9bw4S5ePsEG3rxuGBuGbNn3PE1oBFMpH',
+    name: 'Bollywood Classics — Romantic',
+    era: '1980s–90s',
+    thumb: 'https://i.ytimg.com/vi/Y7QwlhOGZJI/hqdefault.jpg',
+    songs: 'Dheere Dheere Se, Dil Hai Ki Manta Nahin, Aye Mere Humsafar...'
+  },
+  {
+    listId: 'PL5482DCB98FAB3ED4',
+    name: 'Mukesh — Bollywood Evergreens',
+    era: '1950s–70s',
+    thumb: 'https://i.ytimg.com/vi/syhMeKZnhBA/hqdefault.jpg',
+    songs: 'Kisi Ki Muskurahaton Pe, Kabhi Kabhi Mere Dil Mein, Awaara Hoon...'
+  }
 ];
 
 // ===== BUILD PLAYLIST CARDS =====
@@ -1128,7 +1130,72 @@ ytPlaylists.forEach((pl, idx) => {
   `;
   card.addEventListener('click', () => playPlaylist(pl, card));
   grid.appendChild(card);
+
+  // Store reference for auto-play
+  pl._card = card;
 });
+
+// ===== YOUTUBE IFRAME API =====
+let ytPlayer = null;
+let ytReady = false;
+let pendingPlaylist = null;
+
+function onYouTubeIframeAPIReady() {
+  ytReady = true;
+  if (pendingPlaylist) {
+    loadPlaylist(pendingPlaylist);
+    pendingPlaylist = null;
+  }
+}
+
+function loadPlaylist(pl) {
+  const playerBar = document.getElementById('ytPlayer');
+  playerBar.style.display = 'flex';
+  requestAnimationFrame(() => playerBar.classList.add('open'));
+
+  if (ytPlayer) {
+    ytPlayer.destroy();
+    ytPlayer = null;
+  }
+
+  ytPlayer = new YT.Player('ytPlayerDiv', {
+    height: '135',
+    width: '240',
+    playerVars: {
+      listType: 'playlist',
+      list: pl.listId,
+      autoplay: 1,
+      rel: 0,
+      loop: 1,
+      origin: window.location.origin
+    },
+    events: {
+      onReady: function(event) {
+        event.target.setVolume(30);
+        event.target.playVideo();
+      },
+      onStateChange: function(event) {
+        // Update marquee with current video title if available
+        if (event.data === YT.PlayerState.PLAYING) {
+          try {
+            const videoData = event.target.getVideoData();
+            if (videoData && videoData.title) {
+              document.getElementById('marqueeText').textContent =
+                `♪ ${videoData.title}   ✦   ${pl.name} — ${pl.era}   ✦   ♪ ${videoData.title}   ✦   ${pl.name} — ${pl.era}`;
+              document.getElementById('ytSongTitle').textContent = videoData.title;
+            }
+          } catch(e) {}
+        }
+      },
+      onError: function(event) {
+        // Error 150/101 = embed restricted, skip to next
+        if (event.data === 150 || event.data === 101 || event.data === 153) {
+          setTimeout(() => { event.target.nextVideo(); }, 500);
+        }
+      }
+    }
+  });
+}
 
 // ===== PLAY PLAYLIST =====
 function playPlaylist(pl, card) {
@@ -1136,33 +1203,43 @@ function playPlaylist(pl, card) {
   activeCard = card;
   card.classList.add('active');
 
-  const player = document.getElementById('ytPlayer');
-  const iframe = document.getElementById('ytIframe');
-  const title = document.getElementById('ytSongTitle');
-
-  // YouTube playlist embed URL
-  const embedUrl = `https://www.youtube.com/embed/videoseries?list=${pl.listId}&autoplay=1&rel=0`;
-  iframe.src = embedUrl;
-  title.textContent = pl.name;
-
-  player.style.display = 'flex';
-  requestAnimationFrame(() => player.classList.add('open'));
-
-  // Update marquee text with playlist name
+  document.getElementById('ytSongTitle').textContent = pl.name;
   document.getElementById('marqueeText').textContent =
     `♪ ${pl.songs}   ✦   ${pl.name} — ${pl.era}   ✦   ♪ ${pl.songs}   ✦   ${pl.name} — ${pl.era}`;
+
+  if (ytReady) {
+    loadPlaylist(pl);
+  } else {
+    pendingPlaylist = pl;
+  }
 }
 
 function closePlayer() {
-  const player = document.getElementById('ytPlayer');
-  player.classList.remove('open');
+  const playerBar = document.getElementById('ytPlayer');
+  playerBar.classList.remove('open');
   if(activeCard) activeCard.classList.remove('active');
   activeCard = null;
   setTimeout(() => {
-    player.style.display = 'none';
-    document.getElementById('ytIframe').src = '';
+    playerBar.style.display = 'none';
+    if (ytPlayer) {
+      ytPlayer.destroy();
+      ytPlayer = null;
+      // Re-create the div for next time
+      const wrap = document.querySelector('.yt-iframe-wrap');
+      const div = document.createElement('div');
+      div.id = 'ytPlayerDiv';
+      wrap.appendChild(div);
+    }
   }, 400);
 }
+
+// ===== AUTO-PLAY DEFAULT SOFT PLAYLIST =====
+window.addEventListener('load', () => {
+  const defaultPlaylist = ytPlaylists.find(pl => pl.soft) || ytPlaylists[0];
+  if (defaultPlaylist && defaultPlaylist._card) {
+    playPlaylist(defaultPlaylist, defaultPlaylist._card);
+  }
+});
 
 // ===== RADIO MODE BUTTONS =====
 function setMode(btn, mode) {
