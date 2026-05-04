@@ -1258,49 +1258,54 @@ ytPlaylists.forEach((pl, idx) => {
   pl._card = card;
 });
 
-// ===== YOUTUBE IFRAME API =====
+// ===== PLAYER STATE =====
 let ytPlayer = null;
 let ytReady = false;
-let pendingPlaylist = null;
+let currentPlaylist = null;
 let userUnmuted = false;
-let muted = true; // Player always starts muted
-let closeTimeout = null;
-let playDebounce = null;
+let switching = false;
 
+// ===== YOUTUBE API READY =====
 function onYouTubeIframeAPIReady() {
   ytReady = true;
-  if (pendingPlaylist) {
-    loadPlaylist(pendingPlaylist);
-    pendingPlaylist = null;
-  }
+  // Auto-play default playlist
+  const defaultPl = ytPlaylists.find(pl => pl.soft) || ytPlaylists[0];
+  if (defaultPl && defaultPl._card) playPlaylist(defaultPl, defaultPl._card);
 }
 
-function loadPlaylist(pl) {
-  // Cancel any pending close animation to prevent race condition
-  if (closeTimeout) {
-    clearTimeout(closeTimeout);
-    closeTimeout = null;
-  }
+// ===== PLAY PLAYLIST (single entry point) =====
+function playPlaylist(pl, card) {
+  if (switching) return; // Block rapid switches
+  if (currentPlaylist === pl) return; // Already playing this one
 
+  switching = true;
+  currentPlaylist = pl;
+
+  // Update UI
+  if (activeCard) activeCard.classList.remove('active');
+  activeCard = card;
+  card.classList.add('active');
+  document.getElementById('ytSongTitle').textContent = pl.name;
+  document.getElementById('ytBarThumb').src = pl.thumb;
+  document.getElementById('marqueeText').textContent =
+    `${pl.name}   ✦   Tuning in...   ✦   ${pl.name}   ✦   Tuning in...`;
+
+  // Show player bar
   const playerBar = document.getElementById('ytPlayer');
   playerBar.style.display = 'flex';
-  requestAnimationFrame(() => playerBar.classList.add('open'));
+  playerBar.classList.add('open');
 
-  // Always destroy and recreate to ensure playlist actually switches
+  // Destroy old player
   if (ytPlayer) {
     try { ytPlayer.destroy(); } catch(e) {}
     ytPlayer = null;
   }
 
-  // Ensure the target div exists
-  let targetDiv = document.getElementById('ytPlayerDiv');
-  if (!targetDiv) {
-    const wrap = document.querySelector('.yt-iframe-wrap');
-    const div = document.createElement('div');
-    div.id = 'ytPlayerDiv';
-    wrap.appendChild(div);
-  }
+  // Recreate div
+  const wrap = document.querySelector('.yt-iframe-wrap');
+  wrap.innerHTML = '<div id="ytPlayerDiv"></div>';
 
+  // Create new player
   ytPlayer = new YT.Player('ytPlayerDiv', {
     height: '1',
     width: '1',
@@ -1310,184 +1315,116 @@ function loadPlaylist(pl) {
       autoplay: 1,
       mute: userUnmuted ? 0 : 1,
       rel: 0,
-      loop: 1,
-      origin: window.location.origin
+      loop: 1
     },
     events: {
-      onReady: function(event) {
-        event.target.setVolume(30);
-        if (userUnmuted) {
-          event.target.unMute();
-          updateMuteButton(false);
-        } else {
-          updateMuteButton(true);
-        }
-        event.target.playVideo();
+      onReady: function(e) {
+        switching = false;
+        e.target.setVolume(30);
+        if (userUnmuted) { e.target.unMute(); }
+        e.target.playVideo();
+        updateUI();
       },
-      onStateChange: function(event) {
-        if (event.data === YT.PlayerState.PLAYING) {
-          window.__ytPlaying = true;
+      onStateChange: function(e) {
+        if (e.data === YT.PlayerState.PLAYING) {
           try {
-            const videoData = event.target.getVideoData();
-            if (videoData && videoData.title) {
+            const data = e.target.getVideoData();
+            if (data && data.title) {
+              document.getElementById('ytSongTitle').textContent = data.title;
               document.getElementById('marqueeText').textContent =
-                `${pl.name}   ✦   ♪ ${videoData.title}   ✦   ${pl.name}   ✦   ♪ ${videoData.title}`;
-              document.getElementById('ytSongTitle').textContent = videoData.title;
+                `${pl.name}   ✦   ♪ ${data.title}   ✦   ${pl.name}   ✦   ♪ ${data.title}`;
             }
-          } catch(e) {}
+          } catch(err) {}
         }
       },
-      onError: function(event) {
-        // Any error = skip to next video in playlist
-        try { event.target.nextVideo(); } catch(e) {}
+      onError: function(e) {
+        switching = false;
+        try { e.target.nextVideo(); } catch(err) {}
       }
     }
   });
+
+  // Safety: unlock switching after 5s even if onReady never fires
+  setTimeout(() => { switching = false; }, 5000);
 }
 
-// ===== PLAY PLAYLIST =====
-function playPlaylist(pl, card) {
-  // Debounce rapid clicks — only the last click within 600ms fires
-  if (playDebounce) clearTimeout(playDebounce);
-
-  // Update UI immediately for responsiveness
-  if(activeCard) activeCard.classList.remove('active');
-  activeCard = card;
-  card.classList.add('active');
-
-  document.getElementById('ytSongTitle').textContent = pl.name;
-  document.getElementById('ytBarThumb').src = pl.thumb;
-  document.getElementById('marqueeText').textContent =
-    `${pl.name}   ✦   Tuning in...   ✦   ${pl.name}   ✦   Tuning in...`;
-
-  playDebounce = setTimeout(() => {
-    playDebounce = null;
-    if (ytReady) {
-      loadPlaylist(pl);
-    } else {
-      pendingPlaylist = pl;
-    }
-  }, 600);
-}
-
+// ===== CLOSE PLAYER =====
 function closePlayer() {
   const playerBar = document.getElementById('ytPlayer');
   playerBar.classList.remove('open');
-  if(activeCard) activeCard.classList.remove('active');
+  if (activeCard) activeCard.classList.remove('active');
   activeCard = null;
-  closeTimeout = setTimeout(() => {
-    closeTimeout = null;
-    playerBar.style.display = 'none';
-    if (ytPlayer) {
-      ytPlayer.destroy();
-      ytPlayer = null;
-      // Re-create the div for next time
-      const wrap = document.querySelector('.yt-iframe-wrap');
-      const div = document.createElement('div');
-      div.id = 'ytPlayerDiv';
-      wrap.appendChild(div);
-    }
-  }, 400);
+  currentPlaylist = null;
+  playerBar.style.display = 'none';
+  if (ytPlayer) {
+    try { ytPlayer.destroy(); } catch(e) {}
+    ytPlayer = null;
+  }
+  const wrap = document.querySelector('.yt-iframe-wrap');
+  wrap.innerHTML = '<div id="ytPlayerDiv"></div>';
 }
 
+// ===== MUTE / UNMUTE =====
 function toggleSound() {
-  const btn = document.getElementById('ytUnmuteBtn');
-  if (!userUnmuted) {
-    // Currently muted -> unmute
-    userUnmuted = true;
-    if (ytPlayer) {
-      try {
+  userUnmuted = !userUnmuted;
+  if (ytPlayer) {
+    try {
+      if (userUnmuted) {
         ytPlayer.unMute();
         ytPlayer.setVolume(30);
         ytPlayer.playVideo();
-      } catch(e) {}
-    }
-    updateMuteButton(false);
-  } else {
-    // Currently unmuted -> mute
-    userUnmuted = false;
-    if (ytPlayer) {
-      try {
+      } else {
         ytPlayer.mute();
-      } catch(e) {}
-    }
-    updateMuteButton(true);
+      }
+    } catch(e) {}
   }
+  updateUI();
 }
 
-function updateMuteButton(isMuted) {
+function toggleMute(btn) {
+  toggleSound(); // Same action, just from radio button
+}
+
+// ===== UPDATE ALL MUTE UI =====
+function updateUI() {
   const btn = document.getElementById('ytUnmuteBtn');
-  if (isMuted) {
-    btn.textContent = '🔇 Tap to Unmute';
-    btn.classList.add('muted');
-  } else {
+  if (userUnmuted) {
     btn.textContent = '🔊 Tap to Mute';
     btn.classList.remove('muted');
+  } else {
+    btn.textContent = '🔇 Tap to Unmute';
+    btn.classList.add('muted');
   }
-  // Sync radio mute button and waveform
-  syncRadioMute(isMuted);
-}
-
-function syncRadioMute(isMuted) {
-  muted = isMuted;
-  const radioMuteBtn = document.querySelector('.r-btn[onclick*="toggleMute"]');
-  if (radioMuteBtn) {
-    radioMuteBtn.textContent = isMuted ? '◎ Unmute' : '◉ Mute';
-    radioMuteBtn.classList.toggle('active', isMuted);
+  // Radio mute button
+  const radioBtn = document.querySelector('.r-btn[onclick*="toggleMute"]');
+  if (radioBtn) {
+    radioBtn.textContent = userUnmuted ? '◉ Mute' : '◎ Unmute';
+    radioBtn.classList.toggle('active', !userUnmuted);
   }
-  const waveform = document.querySelectorAll('.wave-bar');
-  waveform.forEach(b => {
-    b.style.animationPlayState = isMuted ? 'paused' : 'running';
-    b.style.height = isMuted ? '3px' : '';
+  // Waveform
+  document.querySelectorAll('.wave-bar').forEach(b => {
+    b.style.animationPlayState = userUnmuted ? 'running' : 'paused';
+    b.style.height = userUnmuted ? '' : '3px';
   });
 }
 
-// ===== AUTO-PLAY DEFAULT SOFT PLAYLIST =====
-window.addEventListener('load', () => {
-  const defaultPlaylist = ytPlaylists.find(pl => pl.soft) || ytPlaylists[0];
-  if (defaultPlaylist && defaultPlaylist._card) {
-    playPlaylist(defaultPlaylist, defaultPlaylist._card);
-  }
-});
-
-
-
-// ===== RADIO MODE BUTTONS =====
+// ===== RADIO MODE BUTTONS (AM/FM/SW) =====
 function setMode(btn, mode) {
   document.querySelectorAll('.r-btn').forEach(b => {
-    if(['AM','FM','SW'].includes(b.textContent.trim())) b.classList.remove('active');
+    if (['AM','FM','SW'].includes(b.textContent.trim())) b.classList.remove('active');
   });
   btn.classList.add('active');
-  // Switch to a random playlist (different from current)
-  const currentIdx = ytPlaylists.findIndex(pl => pl._card && pl._card.classList.contains('active'));
+  const currentIdx = ytPlaylists.indexOf(currentPlaylist);
   let idx;
   do { idx = Math.floor(Math.random() * ytPlaylists.length); } while (idx === currentIdx && ytPlaylists.length > 1);
   const pl = ytPlaylists[idx];
   if (pl && pl._card) playPlaylist(pl, pl._card);
 }
 
-function toggleMute(btn) {
-  // Sync with the actual YouTube player mute/unmute
-  if (!muted) {
-    // Muting
-    userUnmuted = false;
-    if (ytPlayer) { try { ytPlayer.mute(); } catch(e) {} }
-    updateMuteButton(true);
-  } else {
-    // Unmuting
-    userUnmuted = true;
-    if (ytPlayer) { try { ytPlayer.unMute(); ytPlayer.setVolume(30); ytPlayer.playVideo(); } catch(e) {} }
-    updateMuteButton(false);
-  }
-}
-
-// ===== VIBRATION SYNC — subtle BPM variation =====
-// Vary the radio vibration speed slightly over time to simulate tempo
-let vt = 0;
+// ===== VIBRATION SYNC =====
 const radioBody = document.querySelector('.radio-body');
 setInterval(() => {
-  vt = (Math.random() * 0.1 + 0.1).toFixed(2); // between 0.10s and 0.20s
-  radioBody.style.animationDuration = `${vt}s`;
+  radioBody.style.animationDuration = `${(Math.random() * 0.1 + 0.1).toFixed(2)}s`;
 }, 4000);
 </script>
 </body>
