@@ -1265,6 +1265,7 @@ let pendingPlaylist = null;
 let userUnmuted = false;
 let muted = true; // Player always starts muted
 let closeTimeout = null;
+let playDebounce = null;
 
 function onYouTubeIframeAPIReady() {
   ytReady = true;
@@ -1346,6 +1347,10 @@ function loadPlaylist(pl) {
 
 // ===== PLAY PLAYLIST =====
 function playPlaylist(pl, card) {
+  // Debounce rapid clicks — only the last click within 600ms fires
+  if (playDebounce) clearTimeout(playDebounce);
+
+  // Update UI immediately for responsiveness
   if(activeCard) activeCard.classList.remove('active');
   activeCard = card;
   card.classList.add('active');
@@ -1355,11 +1360,14 @@ function playPlaylist(pl, card) {
   document.getElementById('marqueeText').textContent =
     `${pl.name}   ✦   Tuning in...   ✦   ${pl.name}   ✦   Tuning in...`;
 
-  if (ytReady) {
-    loadPlaylist(pl);
-  } else {
-    pendingPlaylist = pl;
-  }
+  playDebounce = setTimeout(() => {
+    playDebounce = null;
+    if (ytReady) {
+      loadPlaylist(pl);
+    } else {
+      pendingPlaylist = pl;
+    }
+  }, 600);
 }
 
 function closePlayer() {
