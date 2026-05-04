@@ -1266,9 +1266,19 @@ let userUnmuted = false;
 let switching = false;
 
 // ===== YOUTUBE API READY =====
+let pageLoaded = false;
+
 function onYouTubeIframeAPIReady() {
   ytReady = true;
-  // Auto-play default playlist
+  if (pageLoaded) autoPlayDefault();
+}
+
+window.addEventListener('load', () => {
+  pageLoaded = true;
+  if (ytReady) autoPlayDefault();
+});
+
+function autoPlayDefault() {
   const defaultPl = ytPlaylists.find(pl => pl.soft) || ytPlaylists[0];
   if (defaultPl && defaultPl._card) playPlaylist(defaultPl, defaultPl._card);
 }
@@ -1277,6 +1287,7 @@ function onYouTubeIframeAPIReady() {
 function playPlaylist(pl, card) {
   if (switching) return; // Block rapid switches
   if (currentPlaylist === pl) return; // Already playing this one
+  if (!ytReady) return; // API not loaded yet
 
   switching = true;
   currentPlaylist = pl;
