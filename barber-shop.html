@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Barber Shop</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Special+Elite&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f5ead0;
+    --amber: #c8852a;
+    --dark-wood: #3b1f0a;
+    --mid-wood: #6b3a1f;
+    --light-wood: #a0622b;
+    --warm-black: #1a0e05;
+    --ivory: #fdf5e6;
+    --red-dial: #c0392b;
+    --chrome: #d4c5a9;
+    --glow: #ffbb44;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--warm-black);
+    font-family: 'Special Elite', cursive;
+    overflow-x: hidden;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* GRAIN TEXTURE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.4;
+  }
+
+  /* BACKGROUND — warm sepia vignette */
+  .bg {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 0%, #3d1a04 0%, transparent 60%),
+      radial-gradient(ellipse at 50% 100%, #1a0a02 0%, transparent 60%),
+      linear-gradient(160deg, #1a0e05 0%, #2b1505 40%, #1a0a02 100%);
+    z-index: 0;
+  }
+
+  /* WALLPAPER PATTERN */
+  .wallpaper {
+    position: fixed;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(200,133,42,0.03) 20px, rgba(200,133,42,0.03) 40px),
+      repeating-linear-gradient(-45deg, transparent, transparent 20px, rgba(200,133,42,0.03) 20px, rgba(200,133,42,0.03) 40px);
+    z-index: 0;
+  }
+
+  /* MAIN LAYOUT */
+  .scene {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 30px 20px 60px;
+    gap: 0;
+  }
+
+  /* ===== HEADER ===== */
+  .site-header {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .site-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 6vw, 4.5rem);
+    color: var(--amber);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    text-shadow: 0 0 40px rgba(200,133,42,0.5), 2px 2px 0 var(--dark-wood);
+    line-height: 1;
+  }
+
+  .site-subtitle {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: var(--cream);
+    font-size: clamp(0.8rem, 2vw, 1.1rem);
+    letter-spacing: 0.3em;
+    opacity: 0.7;
+    margin-top: 6px;
+  }
+
+  .header-rule {
+    width: 220px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--amber), transparent);
+    margin: 10px auto;
+  }
+
+  /* ===== HAIR SILHOUETTE LOGO ===== */
+  .logo-container {
+    position: relative;
+    width: 200px;
+    height: 160px;
+    margin: 0 auto 20px;
+  }
+
+  .hair-silhouette {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 20px rgba(200,133,42,0.4));
+  }
+
+  /* Hair strands animated with wind */
+  .hair-strand {
+    transform-origin: bottom center;
+    animation: windBlow 3s ease-in-out infinite;
+  }
+  .hair-strand:nth-child(1) { animation-delay: 0s; animation-duration: 2.8s; }
+  .hair-strand:nth-child(2) { animation-delay: 0.2s; animation-duration: 3.1s; }
+  .hair-strand:nth-child(3) { animation-delay: 0.4s; animation-duration: 2.6s; }
+  .hair-strand:nth-child(4) { animation-delay: 0.1s; animation-duration: 3.3s; }
+  .hair-strand:nth-child(5) { animation-delay: 0.6s; animation-duration: 2.9s; }
+  .hair-strand:nth-child(6) { animation-delay: 0.3s; animation-duration: 3.0s; }
+  .hair-strand:nth-child(7) { animation-delay: 0.5s; animation-duration: 2.7s; }
+  .hair-strand:nth-child(8) { animation-delay: 0.7s; animation-duration: 3.2s; }
+
+  @keyframes windBlow {
+    0%   { transform: rotate(0deg) translateX(0); }
+    25%  { transform: rotate(-8deg) translateX(-4px); }
+    50%  { transform: rotate(5deg) translateX(3px); }
+    75%  { transform: rotate(-6deg) translateX(-3px); }
+    100% { transform: rotate(0deg) translateX(0); }
+  }
+
+  /* Beard strands */
+  .beard-strand {
+    transform-origin: top center;
+    animation: beardWind 3.5s ease-in-out infinite;
+  }
+  .beard-strand:nth-child(1) { animation-delay: 0.1s; }
+  .beard-strand:nth-child(2) { animation-delay: 0.4s; }
+  .beard-strand:nth-child(3) { animation-delay: 0.2s; }
+  .beard-strand:nth-child(4) { animation-delay: 0.5s; }
+  .beard-strand:nth-child(5) { animation-delay: 0.3s; }
+
+  @keyframes beardWind {
+    0%   { transform: rotate(0deg); }
+    30%  { transform: rotate(4deg); }
+    60%  { transform: rotate(-3deg); }
+    100% { transform: rotate(0deg); }
+  }
+
+  /* Floating wind particles */
+  .wind-particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: var(--amber);
+    border-radius: 50%;
+    opacity: 0;
+    animation: floatAway 4s ease-out infinite;
+  }
+  .wind-particle:nth-child(1) { top: 20%; left: 30%; animation-delay: 0s; }
+  .wind-particle:nth-child(2) { top: 10%; left: 60%; animation-delay: 1s; }
+  .wind-particle:nth-child(3) { top: 30%; left: 80%; animation-delay: 2s; }
+  .wind-particle:nth-child(4) { top: 15%; left: 15%; animation-delay: 0.5s; }
+  .wind-particle:nth-child(5) { top: 25%; left: 70%; animation-delay: 1.5s; }
+
+  @keyframes floatAway {
+    0%   { opacity: 0; transform: translate(0, 0) scale(1); }
+    20%  { opacity: 0.8; }
+    100% { opacity: 0; transform: translate(60px, -40px) scale(0); }
+  }
+
+  /* ===== RADIO ===== */
+  .radio-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* Ambient glow below radio */
+  .radio-glow {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    height: 60px;
+    background: radial-gradient(ellipse, rgba(255,187,68,0.25) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: glowPulse 2s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes glowPulse {
+    0%, 100% { opacity: 0.6; transform: translateX(-50%) scaleX(1); }
+    50%       { opacity: 1;   transform: translateX(-50%) scaleX(1.1); }
+  }
+
+  .radio-body {
+    position: relative;
+    width: clamp(280px, 50vw, 420px);
+    background: linear-gradient(160deg, #6b3a1f 0%, #4a2510 40%, #3b1f0a 100%);
+    border-radius: 18px 18px 12px 12px;
+    padding: 22px 28px 26px;
+    box-shadow:
+      0 0 0 3px #8b4513,
+      0 0 0 6px #5c2d0e,
+      8px 10px 30px rgba(0,0,0,0.8),
+      inset 0 2px 4px rgba(255,255,255,0.08),
+      inset 0 -3px 6px rgba(0,0,0,0.5);
+    animation: radioVibrate 0.15s ease-in-out infinite;
+  }
+
+  @keyframes radioVibrate {
+    0%   { transform: translate(0, 0) rotate(0deg); }
+    25%  { transform: translate(0.4px, -0.3px) rotate(0.1deg); }
+    50%  { transform: translate(-0.3px, 0.4px) rotate(-0.1deg); }
+    75%  { transform: translate(0.3px, 0.2px) rotate(0.05deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+  }
+
+  /* Wood grain lines */
+  .radio-body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 18px 18px 12px 12px;
+    background: repeating-linear-gradient(
+      92deg,
+      transparent 0px, transparent 8px,
+      rgba(0,0,0,0.06) 8px, rgba(0,0,0,0.06) 9px,
+      transparent 9px, transparent 18px
+    );
+    pointer-events: none;
+  }
+
+  /* Top brand bar */
+  .radio-brand {
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.4em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    text-shadow: 0 0 10px rgba(200,133,42,0.6);
+    opacity: 0.9;
+  }
+
+  /* SPEAKER GRILLE */
+  .speaker-grille {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: repeat(7, 1fr);
+    gap: 3px;
+    background: var(--dark-wood);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 16px;
+    box-shadow:
+      inset 0 3px 8px rgba(0,0,0,0.8),
+      0 2px 4px rgba(255,187,68,0.1);
+    border: 2px solid #2a1208;
+    position: relative;
+    overflow: hidden;
+    height: 90px;
+  }
+
+  .speaker-grille::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 50%, rgba(255,187,68,0.12) 0%, transparent 70%);
+    border-radius: 6px;
+    animation: speakerGlow 2s ease-in-out infinite;
+  }
+
+  @keyframes speakerGlow {
+    0%, 100% { opacity: 0.5; }
+    50%       { opacity: 1; }
+  }
+
+  .grille-hole {
+    background: #0d0604;
+    border-radius: 2px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.9);
+  }
+
+  /* DISPLAY PANEL — marquee song title */
+  .display-panel {
+    background: #0a1a0a;
+    border: 2px solid #1a3a1a;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      inset 0 2px 8px rgba(0,0,0,0.9),
+      0 0 10px rgba(0,255,50,0.08);
+  }
+
+  .display-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, #0a1a0a 0%, transparent 15%, transparent 85%, #0a1a0a 100%);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .display-label {
+    font-size: 0.55rem;
+    color: #1a6a1a;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    opacity: 0.8;
+  }
+
+  .marquee-track {
+    display: flex;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .marquee-text {
+    display: inline-block;
+    white-space: nowrap;
+    font-family: 'Special Elite', cursive;
+    font-size: 0.82rem;
+    color: #00ff41;
+    text-shadow: 0 0 8px #00ff41, 0 0 20px rgba(0,255,65,0.4);
+    animation: marqueeScroll 25s linear infinite;
+    padding-right: 80px;
+    letter-spacing: 0.08em;
+  }
+
+  @keyframes marqueeScroll {
+    0%   { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+
+  /* CONTROLS ROW */
+  .controls-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    justify-content: space-between;
+  }
+
+  /* TUNING DIAL */
+  .dial-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .dial {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #8b7355, #4a3520 60%, #2a1a0a);
+    border: 3px solid #8b6914;
+    box-shadow:
+      0 4px 12px rgba(0,0,0,0.7),
+      inset 0 2px 4px rgba(255,255,255,0.1),
+      0 0 8px rgba(200,133,42,0.2);
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+
+  .dial:hover { transform: scale(1.05); }
+
+  .dial::after {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 3px;
+    height: 14px;
+    background: var(--amber);
+    border-radius: 2px;
+    box-shadow: 0 0 6px var(--amber);
+  }
+
+  .dial-tuner { animation: dialSpin 8s linear infinite; }
+  .dial-volume { animation: dialSpin 20s linear infinite reverse; }
+
+  @keyframes dialSpin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  .dial-label {
+    font-size: 0.6rem;
+    color: var(--cream);
+    letter-spacing: 0.1em;
+    opacity: 0.7;
+    text-transform: uppercase;
+  }
+
+  /* FREQUENCY BAR */
+  .frequency-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .freq-bar {
+    position: relative;
+    background: #1a0a02;
+    border-radius: 4px;
+    height: 28px;
+    padding: 0 8px;
+    border: 1px solid #3a1a05;
+    overflow: hidden;
+  }
+
+  .freq-scale {
+    display: flex;
+    justify-content: space-between;
+    height: 100%;
+    align-items: flex-end;
+    padding-bottom: 2px;
+  }
+
+  .freq-tick {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .freq-num {
+    font-size: 0.45rem;
+    color: var(--amber);
+    opacity: 0.7;
+  }
+
+  .freq-line {
+    width: 1px;
+    height: 8px;
+    background: var(--amber);
+    opacity: 0.4;
+  }
+
+  .freq-needle {
+    position: absolute;
+    top: 2px;
+    bottom: 2px;
+    width: 2px;
+    background: linear-gradient(180deg, #ff4444, #ff8844);
+    border-radius: 1px;
+    box-shadow: 0 0 6px rgba(255,68,68,0.8);
+    left: 35%;
+    animation: needleSway 12s ease-in-out infinite;
+  }
+
+  @keyframes needleSway {
+    0%,100% { left: 35%; }
+    30%     { left: 42%; }
+    60%     { left: 28%; }
+    80%     { left: 45%; }
+  }
+
+  /* WAVEFORM BARS */
+  .waveform {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+    height: 24px;
+    justify-content: center;
+  }
+
+  .wave-bar {
+    width: 3px;
+    background: linear-gradient(180deg, var(--glow), var(--amber));
+    border-radius: 2px;
+    animation: waveBeat 0.8s ease-in-out infinite;
+    box-shadow: 0 0 4px rgba(255,187,68,0.4);
+  }
+
+  .wave-bar:nth-child(1)  { animation-delay: 0.0s; }
+  .wave-bar:nth-child(2)  { animation-delay: 0.1s; }
+  .wave-bar:nth-child(3)  { animation-delay: 0.2s; }
+  .wave-bar:nth-child(4)  { animation-delay: 0.05s; }
+  .wave-bar:nth-child(5)  { animation-delay: 0.15s; }
+  .wave-bar:nth-child(6)  { animation-delay: 0.25s; }
+  .wave-bar:nth-child(7)  { animation-delay: 0.08s; }
+  .wave-bar:nth-child(8)  { animation-delay: 0.18s; }
+  .wave-bar:nth-child(9)  { animation-delay: 0.28s; }
+  .wave-bar:nth-child(10) { animation-delay: 0.12s; }
+
+  @keyframes waveBeat {
+    0%,100% { height: 4px; }
+    50%     { height: 20px; }
+  }
+
+  /* BUTTONS */
+  .radio-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+    justify-content: center;
+  }
+
+  .r-btn {
+    background: linear-gradient(160deg, #7a4520 0%, #4a2510 100%);
+    border: 2px solid #8b6914;
+    color: var(--amber);
+    font-family: 'Special Elite', cursive;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow:
+      0 4px 8px rgba(0,0,0,0.5),
+      inset 0 1px 2px rgba(255,255,255,0.08);
+    transition: all 0.15s;
+    position: relative;
+    top: 0;
+  }
+
+  .r-btn:hover {
+    background: linear-gradient(160deg, #9a5530 0%, #6a3510 100%);
+    top: -1px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,255,255,0.12);
+  }
+
+  .r-btn:active { top: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.6); }
+
+  .r-btn.active {
+    background: linear-gradient(160deg, #c8852a 0%, #8b4e14 100%);
+    color: var(--warm-black);
+    box-shadow: 0 0 15px rgba(200,133,42,0.5), 0 4px 8px rgba(0,0,0,0.5);
+  }
+
+  /* RADIO FEET */
+  .radio-feet {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 30px;
+    margin-top: -4px;
+  }
+
+  .radio-foot {
+    width: 30px;
+    height: 8px;
+    background: linear-gradient(180deg, #2a1208, #1a0a04);
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.6);
+  }
+
+  /* ANTENNA */
+  .antenna {
+    position: absolute;
+    top: -70px;
+    right: 40px;
+    width: 3px;
+    height: 70px;
+    background: linear-gradient(180deg, #c0c0c0, #888, #555);
+    border-radius: 2px 2px 0 0;
+    transform-origin: bottom center;
+    animation: antennaWobble 6s ease-in-out infinite;
+    box-shadow: 0 0 4px rgba(0,0,0,0.5);
+  }
+
+  .antenna::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    background: #c0c0c0;
+    border-radius: 50%;
+    box-shadow: 0 0 4px rgba(192,192,192,0.4);
+  }
+
+  @keyframes antennaWobble {
+    0%,100% { transform: rotate(0deg); }
+    30%     { transform: rotate(-3deg); }
+    60%     { transform: rotate(2deg); }
+  }
+
+  /* ===== PLAYLIST SECTION ===== */
+  .playlist-section {
+    width: 100%;
+    max-width: 600px;
+    margin-top: 50px;
+  }
+
+  .playlist-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .playlist-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: var(--amber);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .playlist-rule {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--amber), transparent);
+    margin: 8px 0;
+  }
+
+  .playlist-subtitle {
+    font-size: 0.75rem;
+    color: var(--cream);
+    opacity: 0.5;
+    letter-spacing: 0.2em;
+    font-style: italic;
+  }
+
+  /* Playlist cards */
+  .playlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px;
+  }
+
+  .playlist-card {
+    background: linear-gradient(160deg, rgba(107,58,31,0.4), rgba(59,31,10,0.6));
+    border: 1px solid rgba(200,133,42,0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  }
+
+  .playlist-card:hover {
+    border-color: rgba(200,133,42,0.5);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 20px rgba(200,133,42,0.1);
+  }
+
+  .playlist-card.active {
+    border-color: var(--amber);
+    box-shadow: 0 0 20px rgba(200,133,42,0.3), 0 8px 24px rgba(0,0,0,0.6);
+  }
+
+  .playlist-card.active::before {
+    content: '♪ NOW PLAYING';
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    font-size: 0.5rem;
+    color: var(--amber);
+    letter-spacing: 0.1em;
+    background: rgba(0,0,0,0.6);
+    padding: 2px 6px;
+    border-radius: 3px;
+    z-index: 2;
+  }
+
+  .card-thumb {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #1a0a02;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+  }
+
+  .playlist-card:hover .card-thumb-img { opacity: 0.9; }
+
+  .card-play-icon {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.3);
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 2.5rem;
+  }
+
+  .playlist-card:hover .card-play-icon { opacity: 1; }
+
+  .card-info {
+    padding: 10px 12px;
+  }
+
+  .card-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.82rem;
+    color: var(--cream);
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+
+  .card-meta {
+    font-size: 0.6rem;
+    color: var(--amber);
+    opacity: 0.7;
+    letter-spacing: 0.1em;
+  }
+
+  /* YOUTUBE EMBED MODAL */
+  .yt-player {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(26,14,5,0.97);
+    border-top: 2px solid var(--amber);
+    padding: 16px 24px;
+    z-index: 50;
+    display: none;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .yt-player.open {
+    display: flex;
+    transform: translateY(0);
+  }
+
+  .yt-iframe-wrap {
+    width: 240px;
+    height: 135px;
+    flex-shrink: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid rgba(200,133,42,0.3);
+  }
+
+  .yt-iframe-wrap iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .yt-info {
+    flex: 1;
+  }
+
+  .yt-playing-label {
+    font-size: 0.6rem;
+    color: var(--amber);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    opacity: 0.8;
+    margin-bottom: 4px;
+  }
+
+  .yt-song-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    color: var(--cream);
+    line-height: 1.3;
+  }
+
+  .yt-close {
+    background: none;
+    border: 1px solid rgba(200,133,42,0.3);
+    color: var(--amber);
+    font-size: 1rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .yt-close:hover { background: rgba(200,133,42,0.1); border-color: var(--amber); }
+
+  /* ===== FLOATING ELEMENTS ===== */
+  .scissors-deco {
+    position: fixed;
+    opacity: 0.04;
+    font-size: 4rem;
+    color: var(--amber);
+    pointer-events: none;
+    animation: floatDeco 8s ease-in-out infinite;
+  }
+  .scissors-deco.tl { top: 10%; left: 5%; animation-delay: 0s; }
+  .scissors-deco.tr { top: 15%; right: 5%; animation-delay: 2s; font-size: 3rem; }
+  .scissors-deco.bl { bottom: 20%; left: 3%; animation-delay: 4s; font-size: 2.5rem; }
+
+  @keyframes floatDeco {
+    0%,100% { transform: translateY(0) rotate(-10deg); }
+    50%      { transform: translateY(-15px) rotate(10deg); }
+  }
+
+  /* ===== TAGLINE ===== */
+  .tagline {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: var(--cream);
+    opacity: 0.4;
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    text-align: center;
+    margin-top: 40px;
+    padding: 0 20px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 480px) {
+    .radio-body { width: 94vw; padding: 16px 18px 20px; }
+    .playlist-grid { grid-template-columns: 1fr 1fr; }
+    .yt-iframe-wrap { width: 160px; height: 90px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="wallpaper"></div>
+
+<!-- Decorative scissors -->
+<div class="scissors-deco tl">✂</div>
+<div class="scissors-deco tr">✂</div>
+<div class="scissors-deco bl">✂</div>
+
+<div class="scene">
+
+  <!-- HEADER -->
+  <div class="site-header">
+    <div class="header-rule"></div>
+    <h1 class="site-title">The Barber Shop</h1>
+    <div class="header-rule"></div>
+    <p class="site-subtitle">Est. Since the Days of Old Hindi Radio</p>
+  </div>
+
+  <!-- HAIR SILHOUETTE LOGO -->
+  <div class="logo-container">
+    <!-- Wind particles -->
+    <div class="wind-particle"></div>
+    <div class="wind-particle"></div>
+    <div class="wind-particle"></div>
+    <div class="wind-particle"></div>
+    <div class="wind-particle"></div>
+
+    <svg class="hair-silhouette" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="hairGlow">
+          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+          <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- HEAD BASE (silhouette, no face) -->
+      <ellipse cx="100" cy="72" rx="34" ry="36" fill="#c8852a" opacity="0.9" filter="url(#hairGlow)"/>
+
+      <!-- NECK -->
+      <rect x="88" y="100" width="24" height="22" rx="4" fill="#c8852a" opacity="0.9"/>
+
+      <!-- SHOULDERS -->
+      <ellipse cx="100" cy="128" rx="50" ry="22" fill="#c8852a" opacity="0.85"/>
+      <rect x="50" y="116" width="100" height="24" rx="8" fill="#c8852a" opacity="0.85"/>
+
+      <!-- === HAIR STRANDS (animated with wind) === -->
+      <!-- Top hair mass -->
+      <g filter="url(#hairGlow)">
+        <!-- Central top hair -->
+        <path class="hair-strand" d="M85 40 Q80 25 76 8 Q78 6 82 5 Q86 20 90 38Z" fill="#8b5e27"/>
+        <path class="hair-strand" d="M90 38 Q88 20 87 5 Q91 3 94 4 Q94 22 93 40Z" fill="#9e6e30"/>
+        <path class="hair-strand" d="M95 37 Q95 18 96 4 Q100 2 103 3 Q101 20 99 38Z" fill="#8b5e27"/>
+        <path class="hair-strand" d="M100 37 Q102 18 104 4 Q108 3 111 5 Q107 22 104 39Z" fill="#9e6e30"/>
+        <path class="hair-strand" d="M105 39 Q109 22 113 7 Q117 6 120 8 Q115 25 110 41Z" fill="#8b5e27"/>
+
+        <!-- Side hair LEFT — longer, falls with wind -->
+        <path class="hair-strand" d="M72 48 Q60 40 50 55 Q48 40 55 32 Q65 28 72 42Z" fill="#6b3a1f"/>
+        <path class="hair-strand" d="M70 55 Q55 52 44 68 Q44 53 52 43 Q62 38 70 52Z" fill="#7a4520"/>
+        <path class="hair-strand" d="M68 62 Q52 62 44 80 Q42 65 50 55 Q60 48 68 60Z" fill="#6b3a1f"/>
+
+        <!-- Side hair RIGHT -->
+        <path class="hair-strand" d="M128 48 Q140 40 150 55 Q152 40 145 32 Q135 28 128 42Z" fill="#6b3a1f"/>
+        <path class="hair-strand" d="M130 55 Q145 52 156 68 Q156 53 148 43 Q138 38 130 52Z" fill="#7a4520"/>
+      </g>
+
+      <!-- === BEARD (animated differently) === -->
+      <g filter="url(#hairGlow)" opacity="0.9">
+        <path class="beard-strand" d="M88 106 Q80 120 78 138 Q84 140 88 130 Q90 118 90 108Z" fill="#6b3a1f"/>
+        <path class="beard-strand" d="M93 108 Q90 124 88 144 Q94 146 97 134 Q97 120 95 109Z" fill="#7a4520"/>
+        <path class="beard-strand" d="M99 108 Q99 126 100 148 Q105 148 106 136 Q104 122 101 109Z" fill="#6b3a1f"/>
+        <path class="beard-strand" d="M105 108 Q108 124 110 142 Q116 140 116 130 Q112 118 107 108Z" fill="#7a4520"/>
+        <path class="beard-strand" d="M110 106 Q116 118 120 134 Q124 130 122 118 Q118 108 112 104Z" fill="#6b3a1f"/>
+
+        <!-- Mustache -->
+        <path d="M84 97 Q90 103 100 101 Q110 103 116 97 Q110 93 100 95 Q90 93 84 97Z" fill="#5a2e0a" opacity="0.9"/>
+      </g>
+
+      <!-- SUBTLE AMBER GLOW on silhouette edge -->
+      <ellipse cx="100" cy="72" rx="34" ry="36" fill="none" stroke="#c8852a" stroke-width="1.5" opacity="0.3"/>
+    </svg>
+  </div>
+
+  <!-- RADIO SECTION -->
+  <div class="radio-wrapper">
+    <div class="radio-glow"></div>
+
+    <div class="radio-body">
+      <div class="antenna"></div>
+
+      <!-- Brand -->
+      <div class="radio-brand">✦ Vividh Bharati ✦</div>
+
+      <!-- Speaker Grille -->
+      <div class="speaker-grille" id="speakerGrille"></div>
+
+      <!-- LCD Display with Marquee -->
+      <div class="display-panel">
+        <div class="display-label">◉ On Air</div>
+        <div class="marquee-track">
+          <div class="marquee-text" id="marqueeText">
+            ♪ Ek Pyaar Ka Nagma Hai — Lata Mangeshkar, Mukesh &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp; ♪ Awaara Hoon — Raj Kapoor, Mukesh &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp; ♪ Lag Ja Gale — Lata Mangeshkar &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp; ♪ Dum Maro Dum — Asha Bhosle &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp; ♪ Ruk Jaana Nahin — Kishore Kumar
+          </div>
+        </div>
+      </div>
+
+      <!-- Waveform -->
+      <div class="waveform">
+        <div class="wave-bar" style="--h:12px"></div>
+        <div class="wave-bar" style="--h:18px"></div>
+        <div class="wave-bar" style="--h:8px"></div>
+        <div class="wave-bar" style="--h:20px"></div>
+        <div class="wave-bar" style="--h:14px"></div>
+        <div class="wave-bar" style="--h:22px"></div>
+        <div class="wave-bar" style="--h:10px"></div>
+        <div class="wave-bar" style="--h:18px"></div>
+        <div class="wave-bar" style="--h:16px"></div>
+        <div class="wave-bar" style="--h:12px"></div>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls-row" style="margin-top:14px">
+        <div class="dial-group">
+          <div class="dial dial-tuner"></div>
+          <div class="dial-label">Tuner</div>
+        </div>
+
+        <div class="frequency-section">
+          <div class="freq-bar">
+            <div class="freq-scale">
+              <div class="freq-tick"><span class="freq-num">550</span><div class="freq-line"></div></div>
+              <div class="freq-tick"><span class="freq-num">700</span><div class="freq-line"></div></div>
+              <div class="freq-tick"><span class="freq-num">900</span><div class="freq-line"></div></div>
+              <div class="freq-tick"><span class="freq-num">1100</span><div class="freq-line"></div></div>
+              <div class="freq-tick"><span class="freq-num">1400</span><div class="freq-line"></div></div>
+            </div>
+            <div class="freq-needle"></div>
+          </div>
+        </div>
+
+        <div class="dial-group">
+          <div class="dial dial-volume"></div>
+          <div class="dial-label">Volume</div>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="radio-buttons">
+        <button class="r-btn active" onclick="setMode(this,'AM')">AM</button>
+        <button class="r-btn" onclick="setMode(this,'FM')">FM</button>
+        <button class="r-btn" onclick="setMode(this,'SW')">SW</button>
+        <button class="r-btn" onclick="toggleMute(this)">◉ Mute</button>
+      </div>
+    </div>
+
+    <div class="radio-feet">
+      <div class="radio-foot"></div>
+      <div class="radio-foot"></div>
+    </div>
+  </div>
+
+  <!-- PLAYLIST SECTION -->
+  <div class="playlist-section">
+    <div class="playlist-header">
+      <div class="playlist-rule"></div>
+      <div class="playlist-title">Choose Your Era</div>
+      <div class="playlist-rule"></div>
+      <div class="playlist-subtitle">Old Hindi Cinema Playlists — Play on the Barber Shop Radio</div>
+    </div>
+
+    <div class="playlist-grid" id="playlistGrid"></div>
+  </div>
+
+  <p class="tagline">"Woh lamhe, woh baatein, woh purani yaadein..."<br>
+  <span style="letter-spacing:0.3em; font-size:0.7em; opacity:0.6">Those moments, those conversations, those old memories...</span></p>
+
+</div>
+
+<!-- YOUTUBE PLAYER BAR -->
+<div class="yt-player" id="ytPlayer">
+  <div class="yt-iframe-wrap">
+    <iframe id="ytIframe" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  </div>
+  <div class="yt-info">
+    <div class="yt-playing-label">♪ Now Playing</div>
+    <div class="yt-song-title" id="ytSongTitle">—</div>
+  </div>
+  <button class="yt-close" onclick="closePlayer()">✕</button>
+</div>
+
+<script>
+// ===== BUILD SPEAKER GRILLE HOLES =====
+const grille = document.getElementById('speakerGrille');
+for(let i = 0; i < 84; i++) {
+  const hole = document.createElement('div');
+  hole.className = 'grille-hole';
+  grille.appendChild(hole);
+}
+
+// ===== PLAYLISTS DATA =====
+// Public YouTube playlist IDs for old Hindi film songs
+const playlists = [
+  {
+    id: 'PLbQ0IKQ4p4OFE7FJo1-OHTQ31LT8fOuVP',
+    name: 'Kishore Kumar — Golden Hits',
+    era: '1960s–70s',
+    thumb: 'https://i.ytimg.com/vi/oKIBhHMFbQ4/hqdefault.jpg',
+    songs: 'Aane Se Uske, Musafir Hoon Yaaron, Roop Tera Mastana...'
+  },
+  {
+    id: 'PLbQ0IKQ4p4OFwfFyJSX7WP1lQn3AkJbfB',
+    name: 'Lata Mangeshkar — Timeless',
+    era: '1950s–60s',
+    thumb: 'https://i.ytimg.com/vi/Bm9XTlBXUj8/hqdefault.jpg',
+    songs: 'Lag Ja Gale, Ajeeb Dastan Hai Yeh, Woh Shaam Kuch Ajeeb Thi...'
+  },
+  {
+    id: 'PLbQ0IKQ4p4OEiXjnRJ3t0O2qBwJR5GFMa',
+    name: 'Mohammed Rafi — Classics',
+    era: '1950s–70s',
+    thumb: 'https://i.ytimg.com/vi/kh_HvRzQzEo/hqdefault.jpg',
+    songs: 'Dil Ka Bhanwar, Baharon Phool Barsao, Ya Dil Ki Suno...'
+  },
+  {
+    id: 'PLbQ0IKQ4p4OFTm-sCM1PxcgdcWxmpFNqk',
+    name: 'Mukesh — Soulful Melodies',
+    era: '1950s–70s',
+    thumb: 'https://i.ytimg.com/vi/mZ4iYvSBhj8/hqdefault.jpg',
+    songs: 'Kabhi Kabhi, Awaara Hoon, Ek Pyaar Ka Nagma Hai...'
+  },
+  {
+    id: 'PLbQ0IKQ4p4OGUn3mUjPUwHPH7VXsPWY5n',
+    name: 'Asha Bhosle — Evergreens',
+    era: '1960s–80s',
+    thumb: 'https://i.ytimg.com/vi/lKSRniXk9D8/hqdefault.jpg',
+    songs: 'Dum Maro Dum, Chura Liya, In Aankhon Ki Masti...'
+  },
+  {
+    id: 'PLbQ0IKQ4p4OEdvBOXhTsOqCb1zP5p-Hnl',
+    name: 'Old Hindi Film Songs Mix',
+    era: '1940s–80s',
+    thumb: 'https://i.ytimg.com/vi/jnJzr5xbdtk/hqdefault.jpg',
+    songs: 'Compiled golden era classics for the barber chair...'
+  }
+];
+
+// Real public playlists — using known curated YouTube playlist IDs
+const ytPlaylists = [
+  { listId: 'PLbQ0IKQ4p4OFE7FJo1-OHTQ31LT8fOuVP', ...playlists[0] },
+  { listId: 'PLbQ0IKQ4p4OFwfFyJSX7WP1lQn3AkJbfB', ...playlists[1] },
+  { listId: 'PLbQ0IKQ4p4OEiXjnRJ3t0O2qBwJR5GFMa', ...playlists[2] },
+  { listId: 'PLbQ0IKQ4p4OFTm-sCM1PxcgdcWxmpFNqk', ...playlists[3] },
+  { listId: 'PLbQ0IKQ4p4OGUn3mUjPUwHPH7VXsPWY5n', ...playlists[4] },
+  { listId: 'PLbQ0IKQ4p4OEdvBOXhTsOqCb1zP5p-Hnl', ...playlists[5] }
+];
+
+// ===== BUILD PLAYLIST CARDS =====
+const grid = document.getElementById('playlistGrid');
+let activeCard = null;
+
+ytPlaylists.forEach((pl, idx) => {
+  const card = document.createElement('div');
+  card.className = 'playlist-card';
+  card.innerHTML = `
+    <div class="card-thumb">
+      <img class="card-thumb-img" src="${pl.thumb}" alt="${pl.name}" onerror="this.style.display='none'">
+      <div class="card-play-icon">▶</div>
+    </div>
+    <div class="card-info">
+      <div class="card-name">${pl.name}</div>
+      <div class="card-meta">${pl.era} &nbsp;·&nbsp; Click to tune in</div>
+    </div>
+  `;
+  card.addEventListener('click', () => playPlaylist(pl, card));
+  grid.appendChild(card);
+});
+
+// ===== PLAY PLAYLIST =====
+function playPlaylist(pl, card) {
+  if(activeCard) activeCard.classList.remove('active');
+  activeCard = card;
+  card.classList.add('active');
+
+  const player = document.getElementById('ytPlayer');
+  const iframe = document.getElementById('ytIframe');
+  const title = document.getElementById('ytSongTitle');
+
+  // YouTube playlist embed URL
+  const embedUrl = `https://www.youtube.com/embed/videoseries?list=${pl.listId}&autoplay=1&rel=0`;
+  iframe.src = embedUrl;
+  title.textContent = pl.name;
+
+  player.style.display = 'flex';
+  requestAnimationFrame(() => player.classList.add('open'));
+
+  // Update marquee text with playlist name
+  document.getElementById('marqueeText').textContent =
+    `♪ ${pl.songs}   ✦   ${pl.name} — ${pl.era}   ✦   ♪ ${pl.songs}   ✦   ${pl.name} — ${pl.era}`;
+}
+
+function closePlayer() {
+  const player = document.getElementById('ytPlayer');
+  player.classList.remove('open');
+  if(activeCard) activeCard.classList.remove('active');
+  activeCard = null;
+  setTimeout(() => {
+    player.style.display = 'none';
+    document.getElementById('ytIframe').src = '';
+  }, 400);
+}
+
+// ===== RADIO MODE BUTTONS =====
+function setMode(btn, mode) {
+  document.querySelectorAll('.r-btn').forEach(b => {
+    if(['AM','FM','SW'].includes(b.textContent.trim())) b.classList.remove('active');
+  });
+  btn.classList.add('active');
+}
+
+let muted = false;
+function toggleMute(btn) {
+  muted = !muted;
+  btn.textContent = muted ? '◎ Unmute' : '◉ Mute';
+  btn.classList.toggle('active', muted);
+  const waveform = document.querySelectorAll('.wave-bar');
+  waveform.forEach(b => {
+    b.style.animationPlayState = muted ? 'paused' : 'running';
+    b.style.height = muted ? '3px' : '';
+  });
+}
+
+// ===== VIBRATION SYNC — subtle BPM variation =====
+// Vary the radio vibration speed slightly over time to simulate tempo
+let vt = 0;
+const radioBody = document.querySelector('.radio-body');
+setInterval(() => {
+  vt = (Math.random() * 0.1 + 0.1).toFixed(2); // between 0.10s and 0.20s
+  radioBody.style.animationDuration = `${vt}s`;
+}, 4000);
+</script>
+</body>
+</html>
