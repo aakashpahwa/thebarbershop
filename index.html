@@ -874,6 +874,8 @@
     cursor: pointer;
     white-space: nowrap;
     flex-shrink: 0;
+    min-width: 145px;
+    text-align: center;
     transition: background 0.2s, transform 0.2s;
   }
   .yt-unmute-btn:hover {
@@ -1150,7 +1152,7 @@
     <div class="yt-playing-label">♪ Now Playing</div>
     <div class="yt-song-title" id="ytSongTitle">—</div>
   </div>
-  <button class="yt-unmute-btn muted" id="ytUnmuteBtn" onclick="toggleSound()">🔇 Tap for Sound</button>
+  <button class="yt-unmute-btn muted" id="ytUnmuteBtn" onclick="toggleSound()">🔇 Tap to Unmute</button>
   <button class="yt-close" onclick="closePlayer()">✕</button>
 </div>
 
@@ -1378,10 +1380,10 @@ function toggleSound() {
 function updateMuteButton(isMuted) {
   const btn = document.getElementById('ytUnmuteBtn');
   if (isMuted) {
-    btn.textContent = '🔇 Tap for Sound';
+    btn.textContent = '🔇 Tap to Unmute';
     btn.classList.add('muted');
   } else {
-    btn.textContent = '🔊 Sound On';
+    btn.textContent = '🔊 Tap to Mute';
     btn.classList.remove('muted');
   }
 }
