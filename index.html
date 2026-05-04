@@ -1266,6 +1266,20 @@ function loadPlaylist(pl) {
   playerBar.style.display = 'flex';
   requestAnimationFrame(() => playerBar.classList.add('open'));
 
+  // If player already exists, reuse it (preserves audio context on mobile)
+  if (ytPlayer && typeof ytPlayer.loadPlaylist === 'function') {
+    ytPlayer.loadPlaylist({ list: pl.listId, listType: 'playlist', index: 0, startSeconds: 0 });
+    if (userUnmuted) {
+      ytPlayer.unMute();
+      updateMuteButton(false);
+    } else {
+      ytPlayer.mute();
+      updateMuteButton(true);
+    }
+    ytPlayer.setVolume(30);
+    return;
+  }
+
   if (ytPlayer) {
     ytPlayer.destroy();
     ytPlayer = null;
