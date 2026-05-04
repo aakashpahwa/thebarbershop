@@ -1263,6 +1263,8 @@ let ytPlayer = null;
 let ytReady = false;
 let pendingPlaylist = null;
 let userUnmuted = false;
+let muted = true; // Player always starts muted
+let closeTimeout = null;
 
 function onYouTubeIframeAPIReady() {
   ytReady = true;
@@ -1273,6 +1275,12 @@ function onYouTubeIframeAPIReady() {
 }
 
 function loadPlaylist(pl) {
+  // Cancel any pending close animation to prevent race condition
+  if (closeTimeout) {
+    clearTimeout(closeTimeout);
+    closeTimeout = null;
+  }
+
   const playerBar = document.getElementById('ytPlayer');
   playerBar.style.display = 'flex';
   requestAnimationFrame(() => playerBar.classList.add('open'));
@@ -1359,7 +1367,8 @@ function closePlayer() {
   playerBar.classList.remove('open');
   if(activeCard) activeCard.classList.remove('active');
   activeCard = null;
-  setTimeout(() => {
+  closeTimeout = setTimeout(() => {
+    closeTimeout = null;
     playerBar.style.display = 'none';
     if (ytPlayer) {
       ytPlayer.destroy();
@@ -1449,7 +1458,6 @@ function setMode(btn, mode) {
   if (pl && pl._card) playPlaylist(pl, pl._card);
 }
 
-let muted = false;
 function toggleMute(btn) {
   // Sync with the actual YouTube player mute/unmute
   if (!muted) {
