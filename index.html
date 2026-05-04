@@ -814,6 +814,24 @@
   }
   .yt-close:hover { background: rgba(200,133,42,0.1); border-color: var(--amber); }
 
+  .yt-unmute-btn {
+    display: none;
+    background: var(--amber);
+    color: #1a1a1a;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    animation: pulse-unmute 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes pulse-unmute {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); box-shadow: 0 0 12px rgba(200,133,42,0.5); }
+  }
+
   /* ===== FLOATING ELEMENTS ===== */
   .scissors-deco {
     position: fixed;
@@ -1041,6 +1059,7 @@
     <div class="yt-playing-label">♪ Now Playing</div>
     <div class="yt-song-title" id="ytSongTitle">—</div>
   </div>
+  <button class="yt-unmute-btn" id="ytUnmuteBtn" onclick="unmuteAndPlay()">🔊 Click for Sound</button>
   <button class="yt-close" onclick="closePlayer()">✕</button>
 </div>
 
@@ -1195,21 +1214,14 @@ function loadPlaylist(pl) {
     }
   });
 
-  // Fallback: if unmuted autoplay was blocked, retry muted then unmute on click
+  // Fallback: if unmuted autoplay was blocked, retry muted then show unmute button
   setTimeout(() => {
     if (!window.__ytPlaying && ytPlayer && typeof ytPlayer.getPlayerState === 'function') {
       const state = ytPlayer.getPlayerState();
       if (state !== YT.PlayerState.PLAYING && state !== YT.PlayerState.BUFFERING) {
         ytPlayer.mute();
         ytPlayer.playVideo();
-        // Show a subtle prompt and unmute on interaction
-        document.addEventListener('click', function unmute() {
-          if (ytPlayer && typeof ytPlayer.unMute === 'function') {
-            ytPlayer.unMute();
-            ytPlayer.setVolume(30);
-          }
-          document.removeEventListener('click', unmute);
-        }, { once: true });
+        document.getElementById('ytUnmuteBtn').style.display = 'inline-block';
       }
     }
   }, 3000);
@@ -1249,6 +1261,14 @@ function closePlayer() {
       wrap.appendChild(div);
     }
   }, 400);
+}
+
+function unmuteAndPlay() {
+  if (ytPlayer && typeof ytPlayer.unMute === 'function') {
+    ytPlayer.unMute();
+    ytPlayer.setVolume(30);
+  }
+  document.getElementById('ytUnmuteBtn').style.display = 'none';
 }
 
 // ===== AUTO-PLAY DEFAULT SOFT PLAYLIST =====
