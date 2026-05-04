@@ -1064,8 +1064,7 @@ const ytPlaylists = [
     name: 'Carvaan Classics Radio Show',
     era: '1950s–80s',
     thumb: 'https://i.ytimg.com/vi/e5ff83TbWR4/hqdefault.jpg',
-    songs: 'Weekend Classic Radio Show — Romantic, Sad, Kishore Special compilations',
-    soft: true
+    songs: 'Weekend Classic Radio Show — Romantic, Sad, Kishore Special compilations'
   },
   {
     listId: 'PLXCoHsJ9oLeekGDmDf79G7W0jRZlK3nh5',
@@ -1086,7 +1085,8 @@ const ytPlaylists = [
     name: 'Evergreen Old Hindi Songs',
     era: '1960s–80s',
     thumb: 'https://i.ytimg.com/vi/KqpIIaCJggY/hqdefault.jpg',
-    songs: 'Ankhiyon Ke Jharokhon Se, Kehna Hai, Main Chali — classic hits'
+    songs: 'Ankhiyon Ke Jharokhon Se, Kehna Hai, Main Chali — classic hits',
+    soft: true
   },
   {
     listId: 'PLO6WOx_nE9UKClBgylze-GcLcUY1EktsM',
@@ -1165,6 +1165,7 @@ function loadPlaylist(pl) {
       listType: 'playlist',
       list: pl.listId,
       autoplay: 1,
+      mute: 1,
       rel: 0,
       loop: 1,
       origin: window.location.origin
@@ -1240,6 +1241,15 @@ window.addEventListener('load', () => {
     playPlaylist(defaultPlaylist, defaultPlaylist._card);
   }
 });
+
+// Unmute on first user interaction (browser autoplay policy requires muted start)
+document.addEventListener('click', function unmuteOnce() {
+  if (ytPlayer && typeof ytPlayer.unMute === 'function') {
+    ytPlayer.unMute();
+    ytPlayer.setVolume(30);
+  }
+  document.removeEventListener('click', unmuteOnce);
+}, { once: true });
 
 // ===== RADIO MODE BUTTONS =====
 function setMode(btn, mode) {
