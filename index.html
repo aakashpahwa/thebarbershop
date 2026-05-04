@@ -1319,7 +1319,7 @@ function loadPlaylist(pl) {
             const videoData = event.target.getVideoData();
             if (videoData && videoData.title) {
               document.getElementById('marqueeText').textContent =
-                `♪ ${videoData.title}   ✦   ${pl.name} — ${pl.era}   ✦   ♪ ${videoData.title}   ✦   ${pl.name} — ${pl.era}`;
+                `${pl.name}   ✦   ♪ ${videoData.title}   ✦   ${pl.name}   ✦   ♪ ${videoData.title}`;
               document.getElementById('ytSongTitle').textContent = videoData.title;
             }
           } catch(e) {}
@@ -1342,7 +1342,7 @@ function playPlaylist(pl, card) {
   document.getElementById('ytSongTitle').textContent = pl.name;
   document.getElementById('ytBarThumb').src = pl.thumb;
   document.getElementById('marqueeText').textContent =
-    `♪ ${pl.songs}   ✦   ${pl.name} — ${pl.era}   ✦   ♪ ${pl.songs}   ✦   ${pl.name} — ${pl.era}`;
+    `${pl.name}   ✦   Tuning in...   ✦   ${pl.name}   ✦   Tuning in...`;
 
   if (ytReady) {
     loadPlaylist(pl);
