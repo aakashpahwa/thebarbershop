@@ -1404,6 +1404,22 @@ function updateMuteButton(isMuted) {
     btn.textContent = '🔊 Tap to Mute';
     btn.classList.remove('muted');
   }
+  // Sync radio mute button and waveform
+  syncRadioMute(isMuted);
+}
+
+function syncRadioMute(isMuted) {
+  muted = isMuted;
+  const radioMuteBtn = document.querySelector('.r-btn[onclick*="toggleMute"]');
+  if (radioMuteBtn) {
+    radioMuteBtn.textContent = isMuted ? '◎ Unmute' : '◉ Mute';
+    radioMuteBtn.classList.toggle('active', isMuted);
+  }
+  const waveform = document.querySelectorAll('.wave-bar');
+  waveform.forEach(b => {
+    b.style.animationPlayState = isMuted ? 'paused' : 'running';
+    b.style.height = isMuted ? '3px' : '';
+  });
 }
 
 // ===== AUTO-PLAY DEFAULT SOFT PLAYLIST =====
@@ -1426,14 +1442,18 @@ function setMode(btn, mode) {
 
 let muted = false;
 function toggleMute(btn) {
-  muted = !muted;
-  btn.textContent = muted ? '◎ Unmute' : '◉ Mute';
-  btn.classList.toggle('active', muted);
-  const waveform = document.querySelectorAll('.wave-bar');
-  waveform.forEach(b => {
-    b.style.animationPlayState = muted ? 'paused' : 'running';
-    b.style.height = muted ? '3px' : '';
-  });
+  // Sync with the actual YouTube player mute/unmute
+  if (!muted) {
+    // Muting
+    userUnmuted = false;
+    if (ytPlayer) { try { ytPlayer.mute(); } catch(e) {} }
+    updateMuteButton(true);
+  } else {
+    // Unmuting
+    userUnmuted = true;
+    if (ytPlayer) { try { ytPlayer.unMute(); ytPlayer.setVolume(30); ytPlayer.playVideo(); } catch(e) {} }
+    updateMuteButton(false);
+  }
 }
 
 // ===== VIBRATION SYNC — subtle BPM variation =====
